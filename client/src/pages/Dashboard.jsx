@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Button from '../components/Button';
 
 const Dashboard = () => {
   return (
@@ -34,7 +35,9 @@ const Dashboard = () => {
               </Link>
             </nav>
           </div>
-          <Link className="w-full bg-primary text-gray-900 font-bold py-3 px-4 rounded-lg text-center hover:bg-yellow-400 transition-colors block" to="/workouts">New Workout</Link>
+          <Button to="/workouts" className="w-full text-center">
+            New Workout
+          </Button>
         </aside>
         <main className="flex-1 p-8">
           <header className="mb-10">

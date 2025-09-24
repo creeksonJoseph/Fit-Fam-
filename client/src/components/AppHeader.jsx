@@ -7,7 +7,7 @@ const AppHeader = ({ activeTab = '' }) => {
     <header className="flex items-center justify-between px-6 sm:px-10 py-4 border-b border-primary/20 dark:border-primary/30">
       <div className="flex items-center gap-4">
         <Logo />
-        <h1 className="text-2xl font-bold text-black dark:text-white">FitTogether</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">FitFam</h1>
       </div>
       <nav className="hidden md:flex items-center gap-8">
         <Link className={`text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-primary' : 'hover:text-primary'}`} to="/dashboard">Dashboard</Link>

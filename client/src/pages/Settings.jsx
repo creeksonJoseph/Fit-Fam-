@@ -1,5 +1,7 @@
 import React from 'react';
 import Logo from '../components/Logo';
+import Button from '../components/Button';
+import Card from '../components/Card';
 
 const Settings = () => {
   return (
@@ -27,7 +29,7 @@ const Settings = () => {
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold text-background-dark dark:text-white mb-8">Settings</h2>
             <div className="space-y-12">
-              <div className="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
+              <Card>
                 <h3 className="text-2xl font-bold text-background-dark dark:text-white mb-6">Profile</h3>
                 <div className="space-y-6">
                   <div className="flex items-center gap-6">
@@ -49,8 +51,8 @@ const Settings = () => {
                     <input className="mt-1 block w-full bg-background-light dark:bg-background-dark/60 border-none rounded-lg h-12 px-4 text-background-dark dark:text-white focus:ring-2 focus:ring-primary" id="email" name="email" type="email" defaultValue="sunrise.chaser@email.com"/>
                   </div>
                 </div>
-              </div>
-              <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm">
+              </Card>
+              <Card className="p-0">
                 <h3 className="text-2xl font-bold text-background-dark dark:text-white p-6">Account & Privacy</h3>
                 <div className="divide-y divide-background-light dark:divide-background-dark">
                   <a className="flex items-center justify-between p-6 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors duration-200" href="#">
@@ -68,14 +70,14 @@ const Settings = () => {
                     <svg className="text-background-dark/50 dark:text-white/50" fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M181.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L164.69,128,98.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,181.66,133.66Z"></path></svg>
                   </a>
                 </div>
-              </div>
+              </Card>
               <div className="space-y-4">
-                <button className="w-full h-14 bg-primary text-background-dark font-bold text-lg rounded-xl hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark focus:ring-primary transition-colors duration-200">
+                <Button size="lg" className="w-full h-14 text-lg rounded-xl">
                   Save Changes
-                </button>
-                <button className="w-full h-14 bg-background-light dark:bg-background-dark/50 text-background-dark dark:text-white font-bold text-lg rounded-xl hover:bg-primary/20 dark:hover:bg-primary/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark focus:ring-primary transition-colors duration-200">
+                </Button>
+                <Button variant="secondary" size="lg" className="w-full h-14 text-lg rounded-xl">
                   Log Out
-                </button>
+                </Button>
               </div>
             </div>
           </div>
