@@ -1,15 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import AppHeader from "../components/AppHeader";
 
 export default function SignUp() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showRequirements, setShowRequirements] = useState(false);
+  const navigate = useNavigate();
+
+  const requirements = {
+    length: password.length >= 8,
+    symbol: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    number: /\d/.test(password)
+  };
+
+  const isPasswordValid = Object.values(requirements).every(Boolean);
+  const passwordsMatch = password === confirmPassword && confirmPassword !== "";
+  const canSubmit = isPasswordValid && passwordsMatch;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (canSubmit) {
+      navigate('/dashboard');
+    }
+  };
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="bg-background-light dark:bg-background-dark font-display min-h-screen">
+      <AppHeader isAuthenticated={false} showAuthButtons={true} />
+      <div className="flex flex-col min-h-screen">
       <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row w-full max-w-4xl mx-auto">
           <div className="lg:w-1/2 hidden lg:block">
             <img
               alt="Fitness class"
               className="h-full w-full object-cover rounded-l-xl"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8Zwk-qsBd68n7-UgVBck6I5WdIBc7ezPAdnOEzzNi6EuMyct8PwkoAMkFebDci4V7mM1jilfc1FqFgEYE3GO9JiUjoKMnurUO4lNsBeQlxwLrm_G-AE590gS_clkVvXl2LGlNbR7M9UOrYqtqfvwvXUEMksuSR7hHdjHv4RjJ1TpWQ2QP4PmZSTj6KESkAScdc9QZ27c6LBFV0fSQdMHTcnOEBdxqdjE_h5APmYtog1zUVBQ2TqLo9SZtoEZmMyHBSLKQgQW0zUY"
+              src="bruce-mars.jpg"
             />
           </div>
           <div className="w-full lg:w-1/2 space-y-8">
@@ -25,20 +52,8 @@ export default function SignUp() {
                   Join our community and start your fitness journey today.
                 </p>
               </div>
-              <form action="#" className="mt-8 space-y-6" method="POST">
-                <div>
-                  <label className="sr-only" htmlFor="username">
-                    Username
-                  </label>
-                  <input
-                    className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-primary/20 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-base"
-                    id="username"
-                    name="username"
-                    placeholder="Username"
-                    required
-                    type="text"
-                  />
-                </div>
+              <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+
                 <div>
                   <label className="sr-only" htmlFor="email-address">
                     Email address
@@ -53,24 +68,157 @@ export default function SignUp() {
                     type="email"
                   />
                 </div>
-                <div>
+                <div className="relative">
                   <label className="sr-only" htmlFor="password">
                     Password
                   </label>
                   <input
-                    autoComplete="current-password"
-                    className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-primary/20 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-base"
+                    autoComplete="new-password"
+                    className={`appearance-none rounded-lg relative block w-full px-4 py-3 pr-12 border-2 transition-all duration-300 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-base ${
+                      password && isPasswordValid
+                        ? "border-green-500 shadow-green-500/20 shadow-lg focus:ring-green-500 focus:border-green-500"
+                        : password
+                        ? "border-red-500 shadow-red-500/20 shadow-lg focus:ring-red-500 focus:border-red-500"
+                        : "border-primary/20 focus:ring-primary focus:border-primary"
+                    }`}
                     id="password"
                     name="password"
                     placeholder="Password"
                     required
-                    type="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setShowRequirements(e.target.value.length > 0);
+                    }}
+                    onFocus={() => setShowRequirements(password.length > 0)}
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <svg className="h-5 w-5 text-background-dark/50 dark:text-background-light/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5 text-background-dark/50 dark:text-background-light/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                  
+                  {/* Password Requirements Dropdown */}
+                  <div className={`absolute top-full left-0 right-0 mt-2 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border border-primary/20 rounded-lg p-4 shadow-lg transition-all duration-300 z-10 ${
+                    showRequirements && !isPasswordValid ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
+                  }`}>
+                    <div className="space-y-2">
+                      <div className={`flex items-center gap-2 transition-colors duration-200 ${
+                        requirements.length ? "text-green-600" : "text-red-500"
+                      }`}>
+                        {requirements.length ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span className="text-sm">At least 8 characters</span>
+                      </div>
+                      <div className={`flex items-center gap-2 transition-colors duration-200 ${
+                        requirements.symbol ? "text-green-600" : "text-red-500"
+                      }`}>
+                        {requirements.symbol ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span className="text-sm">At least one symbol (!@#$%^&*)</span>
+                      </div>
+                      <div className={`flex items-center gap-2 transition-colors duration-200 ${
+                        requirements.number ? "text-green-600" : "text-red-500"
+                      }`}>
+                        {requirements.number ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span className="text-sm">At least one number</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="sr-only" htmlFor="confirm-password">
+                    Confirm Password
+                  </label>
+                  <input
+                    autoComplete="new-password"
+                    className={`appearance-none rounded-lg relative block w-full px-4 py-3 pr-12 border-2 transition-all duration-300 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-base ${
+                      confirmPassword && passwordsMatch
+                        ? "border-green-500 shadow-green-500/20 shadow-lg focus:ring-green-500 focus:border-green-500"
+                        : confirmPassword && !passwordsMatch
+                        ? "border-red-500 shadow-red-500/20 shadow-lg focus:ring-red-500 focus:border-red-500"
+                        : "border-primary/20 focus:ring-primary focus:border-primary"
+                    }`}
+                    id="confirm-password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    required
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <svg className="h-5 w-5 text-background-dark/50 dark:text-background-light/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5 text-background-dark/50 dark:text-background-light/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                  
+                  {/* Password Match Warning */}
+                  {confirmPassword && !passwordsMatch && (
+                    <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg animate-pulse">
+                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-sm font-medium">Passwords do not match</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <button
-                    className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-bold rounded-lg text-background-dark bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-colors duration-300"
+                    className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-bold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark ${
+                      canSubmit
+                        ? "text-background-dark bg-primary hover:bg-primary/90 focus:ring-primary cursor-pointer"
+                        : "text-background-dark/50 dark:text-background-light/50 bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
+                    }`}
                     type="submit"
+                    disabled={!canSubmit}
                   >
                     Sign Up
                   </button>
@@ -78,19 +226,20 @@ export default function SignUp() {
               </form>
               <div className="mt-6 text-center">
                 <p className="text-sm text-background-dark/70 dark:text-background-light/70">
-                  Already have an account?
-                  <a
+                  Already have an account?{" "}
+                  <Link
+                    to="/login"
                     className="font-medium text-primary hover:text-primary/90"
-                    href="#"
                   >
                     Log in
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
           </div>
         </div>
       </main>
+      </div>
     </div>
   );
 }

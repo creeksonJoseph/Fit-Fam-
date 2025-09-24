@@ -1,58 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Logo from "../components/Logo";
+import AppHeader from "../components/AppHeader";
 
 const LandingPage = () => {
   return (
     <div className="relative w-full min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
-      <header className="py-4 px-6 md:px-10" sticky>
-        <nav className="container mx-auto flex items-center justify-between">
-          <Link className="flex items-center gap-3 text-2xl font-bold" to="/">
-            <Logo />
-            <span>FitFam</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <Link
-              className="text-sm font-medium hover:text-primary transition-colors"
-              to="/"
-            >
-              Home
-            </Link>
-            <Link
-              className="text-sm font-medium hover:text-primary transition-colors"
-              to="/workouts"
-            >
-              Workouts
-            </Link>
-            <Link
-              className="text-sm font-medium hover:text-primary transition-colors"
-              to="/friends"
-            >
-              Community
-            </Link>
-            <Link
-              className="text-sm font-medium hover:text-primary transition-colors"
-              to="/dashboard"
-            >
-              About
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              className="px-6 py-2.5 rounded-full text-sm font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors"
-              to="/login"
-            >
-              Login
-            </Link>
-            <Link
-              className="px-6 py-2.5 rounded-full text-sm font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors"
-              to="/signup"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <AppHeader isAuthenticated={false} showAuthButtons={true} />
 
       <main>
         <section className="py-20 md:py-32">
@@ -157,24 +110,24 @@ const LandingPage = () => {
       <footer className="py-10">
         <div className="container mx-auto px-6 text-center text-subtle-light dark:text-subtle-dark">
           <div className="flex justify-center gap-6 mb-6">
-            <a
+            <Link
               className="text-sm hover:text-primary transition-colors"
-              href="#"
+              to="/privacy"
             >
               Privacy Policy
-            </a>
-            <a
+            </Link>
+            <Link
               className="text-sm hover:text-primary transition-colors"
-              href="#"
+              to="/terms"
             >
               Terms of Service
-            </a>
-            <a
+            </Link>
+            <Link
               className="text-sm hover:text-primary transition-colors"
-              href="#"
+              to="/contact"
             >
               Contact Us
-            </a>
+            </Link>
           </div>
           <p className="text-sm">© 2024 FitFam. All rights reserved.</p>
         </div>

@@ -4,7 +4,7 @@ import Button from './Button';
 
 const Sidebar = ({ activeTab = '' }) => {
   return (
-    <aside className="w-80 bg-background-light dark:bg-background-dark p-6 flex flex-col justify-between border-r border-primary/20 dark:border-primary/30">
+    <aside className="sticky top-0 h-screen w-80 bg-background-light dark:bg-background-dark p-6 flex flex-col justify-between border-r border-primary/20 dark:border-primary/30">
       <div className="flex flex-col gap-8">
         <div className="flex items-center gap-4">
           <div className="size-12 rounded-full bg-cover bg-center" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCjYM-bE9JYJ1pIq4J5HHUvzZKxufwKFOF3nPvvNAdl0G0OV-e4hd2hrwfDaGei66eEHSM-AHXl4dgX4LQ5Lrrx5zMg83gc-RcQGa6F7510eRgIR4kV39xvEnqaxGJYJg2bG2jeh6KKVsreUB5OxVVqE1SzN4SAQggqgoMEM2U49LlbQUse3oQjz7hjBuQHgk0whxrO9npFrriICXcvHXlVls0NjQBJU403vRWJo4bcDZB4dTwC8HrPpqv70wfJpXnyR5qzU-x6mRM")'}}></div>
@@ -33,9 +33,15 @@ const Sidebar = ({ activeTab = '' }) => {
           </Link>
         </nav>
       </div>
-      <Button to="/workouts" className="w-full text-center">
-        New Workout
-      </Button>
+      <Link
+        to="/login"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors duration-300"
+      >
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+        </svg>
+        Logout
+      </Link>
     </aside>
   );
 };
