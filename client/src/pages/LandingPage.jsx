@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   return (
@@ -13,14 +14,14 @@ const LandingPage = () => {
             <span>FitFam</span>
           </a>
           <div className="hidden md:flex items-center gap-8">
-            <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
-            <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Workouts</a>
-            <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Community</a>
-            <a className="text-sm font-medium hover:text-primary transition-colors" href="#">About</a>
+            <Link className="text-sm font-medium hover:text-primary transition-colors" to="/">Home</Link>
+            <Link className="text-sm font-medium hover:text-primary transition-colors" to="/workouts">Workouts</Link>
+            <Link className="text-sm font-medium hover:text-primary transition-colors" to="/friends">Community</Link>
+            <Link className="text-sm font-medium hover:text-primary transition-colors" to="/dashboard">About</Link>
           </div>
           <div className="flex items-center gap-2">
-            <a className="px-6 py-2.5 rounded-full text-sm font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors" href="#">Login</a>
-            <a className="px-6 py-2.5 rounded-full text-sm font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors" href="#">Sign Up</a>
+            <Link className="px-6 py-2.5 rounded-full text-sm font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors" to="/login">Login</Link>
+            <Link className="px-6 py-2.5 rounded-full text-sm font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors" to="/signup">Sign Up</Link>
           </div>
         </nav>
       </header>
@@ -36,8 +37,8 @@ const LandingPage = () => {
                 Join a community of fitness enthusiasts who push each other to achieve their goals. Track your workouts, connect with friends, and celebrate progress together.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <a className="px-8 py-4 rounded-full text-base font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors" href="#">Sign Up for Free</a>
-                <a className="px-8 py-4 rounded-full text-base font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors" href="#">Login</a>
+                <Link className="px-8 py-4 rounded-full text-base font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors" to="/signup">Sign Up for Free</Link>
+                <Link className="px-8 py-4 rounded-full text-base font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors" to="/login">Login</Link>
               </div>
             </div>
             <div className="relative">

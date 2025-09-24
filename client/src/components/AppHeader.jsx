@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Logo from './Logo';
 
 const AppHeader = ({ activeTab = '' }) => {
@@ -9,10 +10,10 @@ const AppHeader = ({ activeTab = '' }) => {
         <h1 className="text-2xl font-bold text-black dark:text-white">FitTogether</h1>
       </div>
       <nav className="hidden md:flex items-center gap-8">
-        <a className={`text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-primary' : 'hover:text-primary'}`} href="#">Dashboard</a>
-        <a className={`text-sm font-medium transition-colors ${activeTab === 'classes' ? 'text-primary' : 'hover:text-primary'}`} href="#">Classes</a>
-        <a className={`text-sm font-medium transition-colors ${activeTab === 'challenges' ? 'text-primary' : 'hover:text-primary'}`} href="#">Challenges</a>
-        <a className={`text-sm font-medium transition-colors ${activeTab === 'community' ? 'text-primary' : 'hover:text-primary'}`} href="#">Community</a>
+        <Link className={`text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-primary' : 'hover:text-primary'}`} to="/dashboard">Dashboard</Link>
+        <Link className={`text-sm font-medium transition-colors ${activeTab === 'workouts' ? 'text-primary' : 'hover:text-primary'}`} to="/workouts">Workouts</Link>
+        <Link className={`text-sm font-medium transition-colors ${activeTab === 'progress' ? 'text-primary' : 'hover:text-primary'}`} to="/my-progress">Progress</Link>
+        <Link className={`text-sm font-medium transition-colors ${activeTab === 'community' ? 'text-primary' : 'hover:text-primary'}`} to="/friends">Community</Link>
       </nav>
       <div className="flex items-center gap-4">
         <button className="p-2 rounded-full hover:bg-primary/20 transition-colors">

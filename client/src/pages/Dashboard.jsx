@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   return (
@@ -15,25 +16,25 @@ const Dashboard = () => {
                 <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V115.55a16,16,0,0,1,5.17-11.78l80-75.48.11-.11a16,16,0,0,1,21.53,0,1.14,1.14,0,0,0,.11.11l80,75.48A16,16,0,0,1,224,115.55Z"></path></svg>
                 <span>Dashboard</span>
               </a>
-              <a className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" href="#">
+              <Link className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" to="/friends">
                 <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"></path></svg>
                 <span>Friends</span>
-              </a>
-              <a className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" href="#">
+              </Link>
+              <Link className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" to="/workouts">
                 <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M248,120h-8V88a16,16,0,0,0-16-16H208V64a16,16,0,0,0-16-16H168a16,16,0,0,0-16,16v56H104V64A16,16,0,0,0,88,48H64A16,16,0,0,0,48,64v8H32A16,16,0,0,0,16,88v32H8a8,8,0,0,0,0,16h8v32a16,16,0,0,0,16,16H48v8a16,16,0,0,0,16,16H88a16,16,0,0,0,16-16V136h48v56a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16v-8h16a16,16,0,0,0,16-16V136h8a8,8,0,0,0,0-16ZM32,168V88H48v80Zm56,24H64V64H88V192Zm104,0H168V64h24V175.82c0,.06,0,.12,0,.18s0,.12,0,.18V192Zm32-24H208V88h16Z"></path></svg>
                 <span>Workouts</span>
-              </a>
-              <a className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" href="#">
+              </Link>
+              <Link className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" to="/my-progress">
                 <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176ZM104,120v24a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm32-16v40a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm32-16v56a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"></path></svg>
                 <span>Progress</span>
-              </a>
-              <a className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" href="#">
+              </Link>
+              <Link className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400 font-medium" to="/settings">
                 <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"></path></svg>
                 <span>Settings</span>
-              </a>
+              </Link>
             </nav>
           </div>
-          <button className="w-full bg-primary text-gray-900 font-bold py-3 px-4 rounded-lg text-center hover:bg-yellow-400 transition-colors">New Workout</button>
+          <Link className="w-full bg-primary text-gray-900 font-bold py-3 px-4 rounded-lg text-center hover:bg-yellow-400 transition-colors block" to="/workouts">New Workout</Link>
         </aside>
         <main className="flex-1 p-8">
           <header className="mb-10">
@@ -47,7 +48,7 @@ const Dashboard = () => {
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Today's Workout</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">Strength Training</p>
-                    <button className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors">Start</button>
+                    <Link className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors inline-block" to="/workouts">Start</Link>
                   </div>
                   <div className="w-32 h-32 rounded-lg bg-cover bg-center" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuABFv9qbjgR8HH6SEDDW-tlCjljyVTG9aa1btgktNVVhpYVTgOzWkqkuA_xmCZxi-qSvbzwlrpJtfjGqB0DHV7fcyGMZu8Jshb9hYu-jtbXxV8-ElXpB3SdJKgj-rCnexceQxxxtZCiX0oSZqLJkpH1s4deM70_2Aq_Sc46gtJ8rGTEpNI6znMBOeY6Q-AHD7D0J5aeoHqp6KTx6cBq1SF9-glaN9ABYziSu7rfIr_xNzvDpW38LV5K-90lQZ0jRMsuthmrYaAqFAE")'}}></div>
                 </div>
@@ -57,7 +58,7 @@ const Dashboard = () => {
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Friends Active Now</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">3 friends are working out</p>
-                    <button className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors">View</button>
+                    <Link className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors inline-block" to="/friends">View</Link>
                   </div>
                   <div className="w-32 h-32 rounded-lg bg-cover bg-center" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAbekwa8x5SOy8tggCWbMxg4mmipEOD2KPcwt6Cdk2XylucxcS8O6WsTo95UhQewXIn2gUSrmNMp_b6IDP6WKKZFfIwrZIxyC3eKT1TDmqpGhrXcf6h_VRuFb-CUC-ZWvRcuep-NtizbgptYYFLMwBybFk0gm1JscXOMVF-797usDswtMSTaweV0SyMSuncpI-6p-6QpI08UZtFdkcMgktn3paWAPBuqjwVu3Y8eXrWqVOdviciC2pQgwJH4vmMxbPpXtuNj96f56A")'}}></div>
                 </div>
@@ -67,7 +68,7 @@ const Dashboard = () => {
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Progress Streak</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">5 days</p>
-                    <button className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors">View</button>
+                    <Link className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors inline-block" to="/my-progress">View</Link>
                   </div>
                   <div className="w-32 h-32 rounded-lg bg-cover bg-center" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtKU3f3ujHljVm8SuO2AUgHDVzrruBoYsIjoHGfTyJIVripOo4o0aSGkc5UvcktPRnr8DqPcvQAEyCdLi8av13VDSdADsTL-ESHpEzKA8Anu6PkJNnc3klnUhth7v062VEuOpav1hz6oCFh48QqqqEFpxg7vsAltLvbDABUxJAxZfhTn_DWidOBdYGMT3InVP3FF7jEvsHe_txhDiOONSkpZGbCsD6L0waUNOOmV82zBFq-20J2wxn-0eldz4T5bJiGwco-FQRBuI")'}}></div>
                 </div>

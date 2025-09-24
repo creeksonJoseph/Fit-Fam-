@@ -1,6 +1,14 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate('/dashboard');
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display">
       <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -17,7 +25,7 @@ const SignUp = () => {
             </p>
           </div>
           <div className="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-8 shadow-xl rounded-xl space-y-6">
-            <form className="space-y-6" method="POST">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label className="sr-only" htmlFor="username">Username</label>
                 <input 
@@ -65,9 +73,9 @@ const SignUp = () => {
             <div className="text-center">
               <p className="text-sm text-background-dark/70 dark:text-background-light/70">
                 Already have an account?{' '}
-                <a className="font-medium text-primary hover:text-primary/90" href="#">
+                <Link className="font-medium text-primary hover:text-primary/90" to="/login">
                   Log in
-                </a>
+                </Link>
               </p>
             </div>
           </div>
