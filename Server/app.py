@@ -1,36 +1,52 @@
-from flask import Flask, request, jsonify, session
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_restful import Api,Resource
+from flask_restful import Api
+from flask_migrate import Migrate
 from models import db
-from routes import User_routes, Workout_routes, Progress_routes, Friends_routes
+
+from routes.User_routes import user_bp
+from routes.Workout_routes import workout_bp
+from routes.Progress_routes import progress_bp
+from routes.Friends_routes import friends_bp
+
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fitness_app.db'
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+        "DATABASE_URL", "sqlite:///fitness_app.db"
+    )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'your_secret_key'
-    
+    app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret")
+
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    if not app.debug: 
+        app.config['SESSION_COOKIE_SECURE'] = True
+
     db.init_app(app)
     CORS(app)
-    api = Api(app)
+    Api(app)
+    Migrate(app, db)
 
-    with app.app_context():
-        db.create_all()
+    app.register_blueprint(user_bp, url_prefix="/users")
+    app.register_blueprint(workout_bp, url_prefix="/workouts")
+    app.register_blueprint(progress_bp, url_prefix="/progress")
+    app.register_blueprint(friends_bp, url_prefix="/friends")
 
-    api.add_resource(User_routes.UserRegister, '/register')
-    api.add_resource(User_routes.UserLogin, '/login')
-    api.add_resource(User_routes.UserProfile, '/profile/<int:user_id>')
-    
-    api.add_resource(Workout_routes.WorkoutList, '/workouts')
-    api.add_resource(Workout_routes.WorkoutDetail, '/workouts/<int:workout_id>')
-    
-    api.add_resource(Progress_routes.ProgressList, '/progress/<int:user_id>')
-    api.add_resource(Progress_routes.ProgressDetail, '/progress/<int:user_id>/<int:progress_id>')
-    
-    api.add_resource(Friends_routes.FriendList, '/friends/<int:user_id>')
-    api.add_resource(Friends_routes.FriendRequest, '/friends/request')
-    
+    @app.errorhandler(404)
+    def not_found(e):
+        return jsonify({"error": "Not Found"}), 404
+
+    @app.errorhandler(500)
+    def server_error(e):
+        return jsonify({"error": "Internal Server Error"}), 500
+
     return app
 
 
 app = create_app()
+
+if __name__ == "__main__":
+    app.run(debug=True)
