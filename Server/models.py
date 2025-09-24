@@ -13,8 +13,12 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
 
     # Relationships
-    progress = db.relationship("UserProgress", back_populates="user", cascade="all, delete-orphan")
-    workouts = db.relationship("Workout", secondary="user_progress", back_populates="users")
+    progress = db.relationship(
+        "UserProgress",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     friends = db.relationship(
         "Friends",
         foreign_keys="[Friends.following_user_id]",
@@ -35,7 +39,11 @@ class Workout(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=text('CURRENT_TIMESTAMP'), nullable=False)
 
     # Relationships
-    users = db.relationship("User", secondary="user_progress", back_populates="workouts")
+    progress = db.relationship(
+        "UserProgress",
+        back_populates="workout",
+        cascade="all, delete-orphan"
+    )
 
     serialize_only = ("id", "name", "description", "duration", "created_at")
 
@@ -56,7 +64,7 @@ class UserProgress(db.Model, SerializerMixin):
 
     # Relationships
     user = db.relationship("User", back_populates="progress")
-    workout = db.relationship("Workout")
+    workout = db.relationship("Workout", back_populates="progress")
 
     serialize_only = ("user_id", "workout_id", "progress", "time_completed", "notes")
 

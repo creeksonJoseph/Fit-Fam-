@@ -15,6 +15,7 @@ class FriendList(Resource):
         friends = Friends.query.filter_by(following_user_id=user_id).all()
         return [f.to_dict() for f in friends], 200
 
+api.add_resource(FriendList, "/<int:user_id>")
 
 class FriendRequest(Resource):
     def post(self):
@@ -37,8 +38,5 @@ class FriendRequest(Resource):
         db.session.add(friend)
         db.session.commit()
         return friend.to_dict(), 201
-
-
-# Register endpoints
-api.add_resource(FriendList, "/<int:user_id>")
+    
 api.add_resource(FriendRequest, "/request")

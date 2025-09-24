@@ -24,6 +24,7 @@ class UserRegister(Resource):
 
         return user.to_dict(), 201
 
+api.add_resource(UserRegister, "/register")
 
 class UserLogin(Resource):
     def post(self):
@@ -36,6 +37,7 @@ class UserLogin(Resource):
 
         return {"message": "Login successful", "user": user.to_dict()}, 200
 
+api.add_resource(UserLogin, "/login")
 
 class UserProfile(Resource):
     def get(self, user_id):
@@ -45,7 +47,4 @@ class UserProfile(Resource):
         return user.to_dict(), 200
 
 
-# Register endpoints
-api.add_resource(UserRegister, "/register")
-api.add_resource(UserLogin, "/login")
 api.add_resource(UserProfile, "/<int:user_id>")

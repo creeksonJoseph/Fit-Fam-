@@ -35,7 +35,8 @@ class ProgressList(Resource):
         db.session.add(user_progress)
         db.session.commit()
         return user_progress.to_dict(), 201
-
+    
+api.add_resource(ProgressList, "/<int:user_id>")
 
 class ProgressDetail(Resource):
     def get(self, user_id, progress_id):
@@ -66,6 +67,4 @@ class ProgressDetail(Resource):
         return {"message": "Progress deleted"}, 200
 
 
-# Register endpoints
-api.add_resource(ProgressList, "/<int:user_id>")
 api.add_resource(ProgressDetail, "/<int:user_id>/<int:progress_id>")

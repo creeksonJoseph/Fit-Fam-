@@ -21,6 +21,8 @@ class WorkoutList(Resource):
         db.session.add(workout)
         db.session.commit()
         return workout.to_dict(), 201
+    
+api.add_resource(WorkoutList, "/")
 
 
 class WorkoutDetail(Resource):
@@ -53,6 +55,4 @@ class WorkoutDetail(Resource):
         return {"message": "Workout deleted"}, 200
 
 
-# Register endpoints
-api.add_resource(WorkoutList, "/")
 api.add_resource(WorkoutDetail, "/<int:workout_id>")
