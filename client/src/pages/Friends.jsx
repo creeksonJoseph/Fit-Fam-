@@ -1,13 +1,13 @@
 import React from 'react';
-import AppHeader from '../components/AppHeader';
 import Button from '../components/Button';
 import SearchInput from '../components/SearchInput';
+import Sidebar from '../components/Sidebar';
 
 const Friends = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-black dark:text-white">
-      <div className="flex flex-col min-h-screen">
-        <AppHeader activeTab="community" />
+      <div className="flex min-h-screen">
+        <Sidebar activeTab="friends" />
         <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">

@@ -1,31 +1,14 @@
 import React from 'react';
 import WorkoutCard from '../components/WorkoutCard';
 import Button from '../components/Button';
+import Sidebar from '../components/Sidebar';
 
 const Workouts = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
-      <div className="flex flex-col min-h-screen">
-        <header className="sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm z-10">
-          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-primary text-3xl">fitness_center</span>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">FitFlow</h1>
-            </div>
-            <nav className="hidden md:flex items-center gap-8">
-              <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Workouts</a>
-              <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Programs</a>
-              <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Community</a>
-            </nav>
-            <div className="flex items-center gap-4">
-              <button className="p-2 rounded-full hover:bg-primary/20 transition-colors">
-                <span className="material-symbols-outlined text-gray-700 dark:text-gray-300">notifications</span>
-              </button>
-              <div className="w-10 h-10 rounded-full bg-cover bg-center" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBjcL42Jc6m0poN0ZM5pv6_glOytom0Rh_No_R2jmaaw3vV1aIxZDMp4t_pwEUl64FcD_5xwTR7thA-Vr_5vzDiy8rRT7kFdYXIEINmLqxRxp7ZsDJmheRvtRoCAV3XJixY8slilIAAuk_9p-Mz1fw_Xb8ZM321zcZEe8R64WPV3el9dnGhq_tuBzfzLQu6KnBClTmklQ-aB0Br5ITI4rOltGe6WQRginVj0zjFxvjzYyvzbnqGHaZq3Jd0pbTdSbtHPhnJo41HpCc")'}}></div>
-            </div>
-          </div>
-        </header>
-        <main className="container mx-auto px-6 py-10 flex-grow">
+      <div className="flex min-h-screen">
+        <Sidebar activeTab="workouts" />
+        <main className="flex-1 p-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-5xl font-extrabold text-gray-900 dark:text-white">Workouts</h2>

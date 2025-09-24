@@ -5,7 +5,7 @@ const GroupWorkout = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-background-dark dark:text-background-light">
       <div className="flex flex-col min-h-screen">
-        <header className="border-b border-background-light-200 dark:border-background-dark-700">
+        <header className="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-background-light-200 dark:border-background-dark-700">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center gap-4">

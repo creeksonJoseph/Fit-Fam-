@@ -1,30 +1,12 @@
 import React from 'react';
-import Logo from '../components/Logo';
+import Sidebar from '../components/Sidebar';
 
 const MyProgress = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-[#111827] dark:text-white">
-      <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-        <div className="layout-container flex h-full grow flex-col">
-          <header className="flex items-center justify-between whitespace-nowrap border-b border-primary/20 dark:border-primary/30 px-10 py-4">
-            <div className="flex items-center gap-4 text-background-dark dark:text-white">
-              <Logo />
-              <h2 className="text-2xl font-bold">FitFam</h2>
-            </div>
-            <div className="flex flex-1 justify-end items-center gap-6">
-              <nav className="hidden md:flex items-center gap-8">
-                <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Overview</a>
-                <a className="text-sm font-medium text-primary" href="#">Training</a>
-                <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Explore</a>
-                <a className="text-sm font-medium hover:text-primary transition-colors" href="#">Challenges</a>
-              </nav>
-              <button className="flex items-center justify-center rounded-full size-10 bg-background-light dark:bg-background-dark text-background-dark dark:text-white hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
-              <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD_QG_gTh-ncLYOF9IrWbSOjxjApEJN771dIzy8PtJptAzcv6J6i5Dpw1HIU7ZjeGkgc-0L6iGMi4MZgndQlkxsfsGurpRSCLGcPQDQpk3gu-HCsNZnARzOjsm2m1TspOq0JeI6nfaHgZYopYezgAkdmwyi7jy-DfRjf8DMUDgDOz4KUSSvSkeL7A-oDgaq01qTMBib8csAJh9HYzQ_v_P16fh4A7NFfkrc1zgfx7AgXYQLD9pDdv86VZ5b5f0zLkIJeyHaEGXgukpH")'}}></div>
-            </div>
-          </header>
-          <main className="flex-1 px-4 sm:px-6 lg:px-8 py-12">
+      <div className="flex min-h-screen">
+        <Sidebar activeTab="progress" />
+        <main className="flex-1 p-8">
             <div className="mx-auto max-w-5xl">
               <div className="mb-12">
                 <h1 className="text-5xl font-bold text-background-dark dark:text-white">My Progress</h1>
@@ -126,8 +108,7 @@ const MyProgress = () => {
                 </div>
               </div>
             </div>
-          </main>
-        </div>
+        </main>
       </div>
     </div>
   );
