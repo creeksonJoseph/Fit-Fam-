@@ -1,6 +1,14 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate('/dashboard');
+  };
+
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
       <div className="flex items-center justify-center min-h-screen">
@@ -9,7 +17,7 @@ const Login = () => {
             <h1 className="text-4xl font-black text-gray-900 dark:text-white">RISE AND GRIND</h1>
             <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Welcome back, champ!</p>
           </div>
-          <form className="mt-8 space-y-6" method="POST">
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <input name="remember" type="hidden" value="true"/>
             <div className="rounded-lg shadow-sm -space-y-px">
               <div>
@@ -54,9 +62,9 @@ const Login = () => {
             </div>
           </form>
           <div className="text-sm text-center">
-            <a className="font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary" href="#">
+            <Link className="font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary" to="/signup">
               Don't have an account? Sign up
-            </a>
+            </Link>
           </div>
         </div>
       </div>

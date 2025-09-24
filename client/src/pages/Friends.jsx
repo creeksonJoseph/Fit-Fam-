@@ -1,25 +1,23 @@
 import React from 'react';
-import AppHeader from '../components/AppHeader';
+import Button from '../components/Button';
+import SearchInput from '../components/SearchInput';
+import Sidebar from '../components/Sidebar';
 
 const Friends = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-black dark:text-white">
-      <div className="flex flex-col min-h-screen">
-        <AppHeader activeTab="community" />
+      <div className="flex min-h-screen">
+        <Sidebar activeTab="friends" />
         <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
               <h2 className="text-4xl font-bold tracking-tight">Friends</h2>
-              <button className="bg-primary text-black font-bold py-2 px-6 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-all">
-                <span className="material-symbols-outlined">person_add</span>
-                <span>Add Friend</span>
-              </button>
+              <Button icon="person_add" size="sm">
+                Add Friend
+              </Button>
             </div>
             <div className="mb-12">
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50">search</span>
-                <input className="w-full bg-white dark:bg-background-dark border border-primary/20 dark:border-primary/30 rounded-lg py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-black/50 dark:placeholder:text-white/50" placeholder="Search by username..." type="text"/>
-              </div>
+              <SearchInput placeholder="Search by username..." />
             </div>
             <div className="space-y-8">
               <div>
@@ -66,12 +64,8 @@ const Friends = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button className="bg-primary text-black p-2 rounded-full hover:bg-opacity-80 transition-opacity">
-                        <span className="material-symbols-outlined">check</span>
-                      </button>
-                      <button className="bg-background-light dark:bg-background-dark/80 text-black dark:text-white p-2 rounded-full hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
-                        <span className="material-symbols-outlined">close</span>
-                      </button>
+                      <Button variant="icon" icon="check" />
+                      <Button variant="secondary" icon="close" className="p-2 rounded-full" />
                     </div>
                   </div>
                   <div className="flex items-center justify-between p-4 bg-white dark:bg-black/20 rounded-xl">
@@ -83,12 +77,8 @@ const Friends = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button className="bg-primary text-black p-2 rounded-full hover:bg-opacity-80 transition-opacity">
-                        <span className="material-symbols-outlined">check</span>
-                      </button>
-                      <button className="bg-background-light dark:bg-background-dark/80 text-black dark:text-white p-2 rounded-full hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
-                        <span className="material-symbols-outlined">close</span>
-                      </button>
+                      <Button variant="icon" icon="check" />
+                      <Button variant="secondary" icon="close" className="p-2 rounded-full" />
                     </div>
                   </div>
                 </div>
