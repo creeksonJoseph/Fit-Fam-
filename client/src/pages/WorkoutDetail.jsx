@@ -1,9 +1,73 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
 const WorkoutDetail = () => {
+  const { id } = useParams();
+  const [exercise, setExercise] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const BASE_URL = 'https://fit-fam-server.onrender.com';
+
+  useEffect(() => {
+    const fetchExercise = () => {
+      // Only use cached exercises since individual exercise API doesn't exist
+      const cachedExercises = localStorage.getItem('exercises');
+      if (cachedExercises) {
+        const exercises = JSON.parse(cachedExercises);
+        const cachedExercise = exercises.find(ex => ex.id === id);
+        if (cachedExercise) {
+          console.log('📦 Using cached exercise data for ID:', id);
+          setExercise(cachedExercise);
+        } else {
+          console.log('❌ Exercise not found in cache for ID:', id);
+        }
+      } else {
+        console.log('❌ No cached exercises found');
+      }
+      setLoading(false);
+    };
+
+    if (id) {
+      fetchExercise();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="workouts" />
+          <main className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-background-dark dark:text-background-light">Loading exercise...</p>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (!exercise) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="workouts" />
+          <main className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-background-dark dark:text-background-light">Exercise not found</p>
+              <Link to="/workouts" className="mt-4 inline-block bg-primary text-black px-4 py-2 rounded-lg">Back to Workouts</Link>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background-light dark:bg-background-dark font-display">
       <AppHeader />
@@ -22,11 +86,11 @@ const WorkoutDetail = () => {
               <span className="sm:hidden">Back</span>
             </Link>
 
-            <div className="relative w-full aspect-video rounded-lg sm:rounded-xl overflow-hidden shadow-lg mb-6 sm:mb-8">
+            <div className="relative w-full max-w-md mx-auto rounded-lg sm:rounded-xl overflow-hidden shadow-lg mb-6 sm:mb-8 bg-background-dark/5 dark:bg-background-light/5">
               <img 
-                alt="Exercise demonstration" 
-                className="w-full h-full object-cover" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqz4oIxTMRi_VxCVZSsL1_zwmdfpnPcYzAXhtf-c738kiNGnaEYdFG5Ks5J48AihLCmxtFWYIb9Xqu3vCXU3HdBSlJG10qBiWUSvhUX5bWyMmPw3xw0s7iF3tMN7LxsyNw1Nr1WWznOXCpG08U8kB7wkf6kY_bpt2o_S5Kixp0FnE7cexAs6d3oQ1w2Opxq3nS9K1d9lg21TtIrcbUqhxanAn1vl5jdkvLtV71xS70jnpJrXQrQeiErdCfIh-xOBBATiYS1UQvZUA"
+                alt={exercise.name} 
+                className="w-full h-auto object-contain" 
+                src={exercise.gifUrl}
               />
             </div>
 
@@ -36,23 +100,23 @@ const WorkoutDetail = () => {
                 <div className="space-y-3 sm:space-y-4 rounded-lg bg-white dark:bg-background-dark/20 border border-primary/20 dark:border-primary/30 p-4 sm:p-6">
                   <div className="flex justify-between">
                     <span className="font-medium text-background-dark/60 dark:text-background-light/60">Name</span>
-                    <span className="font-semibold text-background-dark dark:text-background-light">Squats</span>
+                    <span className="font-semibold text-background-dark dark:text-background-light capitalize">{exercise.name}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium text-background-dark/60 dark:text-background-light/60">Body Part</span>
-                    <span className="font-semibold text-background-dark dark:text-background-light">Legs</span>
+                    <span className="font-semibold text-background-dark dark:text-background-light capitalize">{exercise.bodyPart}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium text-background-dark/60 dark:text-background-light/60">Target Muscle</span>
-                    <span className="font-semibold text-background-dark dark:text-background-light">Quadriceps</span>
+                    <span className="font-semibold text-background-dark dark:text-background-light capitalize">{exercise.target}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium text-background-dark/60 dark:text-background-light/60">Equipment</span>
-                    <span className="font-semibold text-background-dark dark:text-background-light">Barbell</span>
+                    <span className="font-semibold text-background-dark dark:text-background-light capitalize">{exercise.equipment}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium text-background-dark/60 dark:text-background-light/60">Secondary Muscles</span>
-                    <span className="font-semibold text-background-dark dark:text-background-light">Hamstrings, Glutes</span>
+                    <span className="font-semibold text-background-dark dark:text-background-light capitalize">{exercise.secondaryMuscles?.join(', ') || 'N/A'}</span>
                   </div>
                 </div>
               </div>
@@ -61,20 +125,18 @@ const WorkoutDetail = () => {
                 <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-background-dark dark:text-background-light">Instructions</h2>
                 <div className="space-y-2 sm:space-y-3">
                   <ol className="list-decimal list-inside space-y-2 text-sm sm:text-base text-background-dark dark:text-background-light">
-                    <li>Stand with your feet shoulder-width apart, holding a barbell across your upper back.</li>
-                    <li>Lower your body as if sitting in a chair, keeping your back straight and core engaged.</li>
-                    <li>Descend until your thighs are parallel to the ground.</li>
-                    <li>Push back up to the starting position.</li>
-                    <li>Repeat for the desired number of repetitions.</li>
+                    {exercise.instructions?.map((instruction, index) => (
+                      <li key={index}>{instruction}</li>
+                    )) || <li>Instructions not available for this exercise.</li>}
                   </ol>
                 </div>
               </div>
             </div>
 
             <div className="text-center pt-6 sm:pt-8">
-              <button className="inline-block bg-primary text-black font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-lg text-base sm:text-lg hover:bg-primary/90 transition-all transform hover:scale-105 shadow-lg">
+              <Link to={`/workout-session/${exercise.id}`} className="inline-block bg-primary text-black font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-lg text-base sm:text-lg hover:bg-primary/90 transition-all transform hover:scale-105 shadow-lg">
                 Start Workout
-              </button>
+              </Link>
             </div>
           </div>
         </main>

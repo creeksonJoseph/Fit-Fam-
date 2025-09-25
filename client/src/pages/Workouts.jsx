@@ -1,9 +1,185 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
 const Workouts = () => {
+  const [allExercises, setAllExercises] = useState([]);
+  const [filteredExercises, setFilteredExercises] = useState([]);
+  const [displayedExercises, setDisplayedExercises] = useState([]);
+  const [bodyParts, setBodyParts] = useState([]);
+  const [selectedBodyPart, setSelectedBodyPart] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const ITEMS_PER_PAGE = 20;
+
+  const BASE_URL = 'https://fit-fam-server.onrender.com';
+
+
+
+  const fetchAllExercises = async () => {
+    // Check localStorage first
+    const cachedExercises = localStorage.getItem('exercises');
+    const cachedTimestamp = localStorage.getItem('exercises_timestamp');
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    
+    if (cachedExercises && cachedTimestamp) {
+      const isExpired = Date.now() - parseInt(cachedTimestamp) > ONE_DAY;
+      if (!isExpired) {
+
+        const exercises = JSON.parse(cachedExercises);
+        return exercises;
+      }
+    }
+    
+    try {
+      const response = await fetch(`${BASE_URL}/exercises`);
+      
+      if (!response.ok) {
+        return [];
+      }
+      
+      const data = await response.json();
+      
+      const exercises = Array.isArray(data) ? data.map(exercise => ({
+        id: exercise.exerciseId,
+        name: exercise.name,
+        bodyPart: exercise.bodyParts?.[0] || 'unknown',
+        equipment: exercise.equipments?.[0] || 'unknown',
+        target: exercise.targetMuscles?.[0] || 'unknown',
+        gifUrl: exercise.gifUrl,
+        instructions: exercise.instructions || []
+      })) : [];
+      
+      // Cache in localStorage
+      localStorage.setItem('exercises', JSON.stringify(exercises));
+      localStorage.setItem('exercises_timestamp', Date.now().toString());
+      
+      return exercises;
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const fetchBodyParts = async () => {
+    // Check localStorage first
+    const cachedBodyParts = localStorage.getItem('bodyparts');
+    const cachedTimestamp = localStorage.getItem('bodyparts_timestamp');
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    
+    if (cachedBodyParts && cachedTimestamp) {
+      const isExpired = Date.now() - parseInt(cachedTimestamp) > ONE_DAY;
+      if (!isExpired) {
+
+        const bodyParts = JSON.parse(cachedBodyParts);
+        setBodyParts(bodyParts);
+        return;
+      }
+    }
+    
+    try {
+      const response = await fetch(`${BASE_URL}/bodyparts`);
+      
+      if (!response.ok) {
+        setBodyParts([]);
+        return;
+      }
+      
+      const data = await response.json();
+      
+      const bodyPartNames = Array.isArray(data) ? data.map(bp => bp.name) : [];
+      
+      // Cache in localStorage
+      localStorage.setItem('bodyparts', JSON.stringify(bodyPartNames));
+      localStorage.setItem('bodyparts_timestamp', Date.now().toString());
+      
+      setBodyParts(bodyPartNames);
+    } catch (error) {
+      setBodyParts([]);
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const exercises = await fetchAllExercises();
+      await fetchBodyParts();
+
+      setAllExercises(exercises);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  // Filter exercises based on search and body part
+  useEffect(() => {
+
+    let filtered = allExercises;
+    if (selectedBodyPart !== 'all') {
+      filtered = filtered.filter(exercise => exercise.bodyPart?.toLowerCase() === selectedBodyPart.toLowerCase());
+    }
+    if (searchTerm) {
+      filtered = filtered.filter(exercise => 
+        exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredExercises(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [allExercises, selectedBodyPart, searchTerm]);
+  
+  // Paginate filtered exercises
+  useEffect(() => {
+    const startIndex = 0;
+    const endIndex = currentPage * ITEMS_PER_PAGE;
+    const paginatedExercises = filteredExercises.slice(startIndex, endIndex);
+    
+    setDisplayedExercises(paginatedExercises);
+    setHasMore(endIndex < filteredExercises.length);
+  }, [filteredExercises, currentPage]);
+  
+  // Infinite scroll with intersection observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (sentinel) {
+      observer.observe(sentinel);
+    }
+
+    return () => {
+      if (sentinel) {
+        observer.unobserve(sentinel);
+      }
+    };
+  }, [hasMore]);
+
+  if (loading) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="workouts" />
+          <main className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-background-dark dark:text-background-light">Loading exercises...</p>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background-light dark:bg-background-dark font-display">
       <AppHeader />
@@ -26,97 +202,88 @@ const Workouts = () => {
                 className="w-full h-12 sm:h-16 pl-10 sm:pl-16 pr-4 sm:pr-6 rounded-lg bg-background-light dark:bg-background-dark border border-background-dark/10 dark:border-background-light/10 focus:ring-2 focus:ring-primary focus:outline-none transition-shadow text-sm sm:text-lg placeholder:text-background-dark/40 dark:placeholder:text-background-light/40" 
                 placeholder="Search exercises, e.g. 'bicep curl'" 
                 type="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-16">
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-primary text-black">All</button>
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Arms</button>
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Legs</button>
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Core</button>
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Back</button>
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Chest</button>
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Shoulders</button>
-              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Cardio</button>
+              <button 
+                onClick={() => setSelectedBodyPart('all')}
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full transition-colors ${
+                  selectedBodyPart === 'all' 
+                    ? 'bg-primary text-black' 
+                    : 'bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20'
+                }`}
+              >
+                All
+              </button>
+              {Array.isArray(bodyParts) && bodyParts.slice(0, 7).map((bodyPart) => (
+                <button 
+                  key={bodyPart}
+                  onClick={() => setSelectedBodyPart(bodyPart)}
+                  className={`px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full transition-colors capitalize ${
+                    selectedBodyPart === bodyPart 
+                      ? 'bg-primary text-black' 
+                      : 'bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20'
+                  }`}
+                >
+                  {bodyPart}
+                </button>
+              ))}
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8">
-              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCzgOeCJyjHvXRL4t5uxX4b5YxID1we2e44RZbt_PSkIOHRjBAu5jK050f3qG6Uy03kMWfyd6u5oR7wPRozeBNPWtCCuOTP3quKE_usKxqaEFUcA5cEhcnG0Vs4oMwW0i-ib-JD28Xy1N5EUs_LeAAroQM9RmITmUXd8AKk97iTRAV-2j8900p361Fg5jIWbXiWUnRAGupWsPU7R3nhZ8Sm0Igmgpj4kPOD6I5eB4rgFWS1xB42-b_dRpxRrYax_NjngnHUkLT1umc")'}}></div>
-                <div className="p-3 sm:p-5 flex-grow flex flex-col">
-                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Bicep Curl</h3>
-                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Arms</p>
-                  <div className="flex items-center justify-between gap-2 mt-2 sm:mt-3">
-                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60 min-w-0 flex-1">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                      </svg>
-                      <span className="truncate">Dumbbell</span>
-                    </span>
-                    <Link to="/workout-detail" className="px-3 py-1.5 text-xs sm:text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors flex-shrink-0">
-                      Grind
-                    </Link>
+              {Array.isArray(displayedExercises) && displayedExercises.map((exercise) => (
+                <div key={exercise.id} className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                  <div className="w-full aspect-video bg-background-dark/5 dark:bg-background-light/5 flex items-center justify-center">
+                    <img 
+                      src={exercise.gifUrl} 
+                      alt={exercise.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzBDMTA1LjUyMyA3MCAxMTAgNzQuNDc3IDExMCA4MFY5MEMxMTAgOTUuNTIzIDEwNS41MjMgMTAwIDEwMCAxMDBDOTQuNDc3IDEwMCA5MCA5NS41MjMgOTAgOTBWODBDOTAgNzQuNDc3IDk0LjQ3NyA3MCAxMDAgNzBaIiBmaWxsPSIjOUI5QjlCIi8+CjxwYXRoIGQ9Ik04MCA1MEg5MFY2MEg4MFY1MFoiIGZpbGw9IiM5QjlCOUIiLz4KPHA+dGggZD0iTTExMCA1MEgxMjBWNjBIMTEwVjUwWiIgZmlsbD0iIzlCOUI5QiIvPgo8cGF0aCBkPSJNNzAgMTEwSDEzMFYxMjBINzBWMTEwWiIgZmlsbD0iIzlCOUI5QiIvPgo8dGV4dCB4PSIxMDAiIHk9IjE0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzlCOUI5QiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj5FeGVyY2lzZTwvdGV4dD4KPHN2Zz4=';
+                        e.target.style.objectFit = 'contain';
+                        e.target.style.padding = '20px';
+                      }}
+                    />
+                  </div>
+                  <div className="p-3 sm:p-5 flex-grow flex flex-col">
+                    <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light capitalize">{exercise.name}</h3>
+                    <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50 capitalize">{exercise.bodyPart}</p>
+                    <div className="flex items-center justify-between gap-2 mt-2 sm:mt-3">
+                      <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60 min-w-0 flex-1">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                        </svg>
+                        <span className="truncate capitalize">{exercise.equipment}</span>
+                      </span>
+                      <Link to={`/workout-detail/${exercise.id}`} className="px-3 py-1.5 text-xs sm:text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors flex-shrink-0">
+                        Grind
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDndU82yVJrYY84KS-46QY_rSoq8aXYF_qgFV_UZLf0NvM8vojnMXemDeP1DJ6gChEXWF2xL_WSIzVyVuNjVs58JipSsdAMn16ZQQ2JY8ZJUOUFmzL-XmURKIfHKu91FuY3aecwBW9cUMWAelEyWO5dRgVxIlRMa3Ws0oiBsAQ6F48NJuZ9QX1MTaPrO2Ho3znms_awXQUz29d9cd8e4Mm4JzmqhydGbNgbVof5plbMC-dN4PV_mKLP_sYRw-Mh0eZBJAq-95gsAEQ")'}}></div>
-                <div className="p-3 sm:p-5 flex-grow flex flex-col">
-                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Squats</h3>
-                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Legs</p>
-                  <div className="flex items-center justify-between mt-2 sm:mt-3">
-                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                      </svg>
-                      Barbell
-                    </span>
-                    <Link to="/workout-detail" className="px-3 py-1.5 text-xs sm:text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
-                      Grind
-                    </Link>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA630hdlp-NB_6wbo6vnJ4pWFZF8AupML3WG6H6TkUAGVwQHDpfgHGPTjCDmye5yNeBH84d7YE2khbHdOfGWmmkXsW3moiZrbKQ3Ngd9NqXcnRPQcCsqUmCMDyJ-uiF_C_DKsTxhAE8UaK34WFDTXTzJ3Nm6SGnrysFx1znOFdWy8pzF_pZIeIW3PILeIvpu14vvXCcI36zjSCDh8Ar-ILcrvPdwvIE3kiVM--l6I12s9RGjuX-eyO5aa3XLS8H9ROC1z8DOYKOP-g")'}}></div>
-                <div className="p-3 sm:p-5 flex-grow flex flex-col">
-                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Plank</h3>
-                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Core</p>
-                  <div className="flex items-center justify-between mt-2 sm:mt-3">
-                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z" />
-                      </svg>
-                      Bodyweight
-                    </span>
-                    <Link to="/workout-detail" className="px-3 py-1.5 text-xs sm:text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
-                      Grind
-                    </Link>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAJZSaag13CqpwFEK875O7UQNbmDPUFWhI1UciilI4VkwgZ-htB190Hyxn3jf2JOV9kVqOOunRp4NYU64ZyImdA5tfl10HyKguFzyXFcA3RRMzThk8lRA0c9ksEpSCw84i-7qPhVg9cU_g_Rdddg94PPN0qJLJfD9P9CS8bKYD9rRtZBMSD38d8Fuh-8iZBlCqBpsI0e_lK0wtzWHzoauLiBvCKGDqyVGKPUYT-GwoiZU7pTd5aZPwXkKebvKAwzIGLrQ-kWvc5x5o")'}}></div>
-                <div className="p-3 sm:p-5 flex-grow flex flex-col">
-                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Pull-ups</h3>
-                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Back</p>
-                  <div className="flex items-center justify-between mt-2 sm:mt-3">
-                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z" />
-                      </svg>
-                      Bodyweight
-                    </span>
-                    <Link to="/workout-detail" className="px-3 py-1.5 text-xs sm:text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
-                      Try it out
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
+            
+            {filteredExercises.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-background-dark/60 dark:text-background-light/60">No exercises found. Try adjusting your search or filter.</p>
+              </div>
+            )}
+            
+            {hasMore && displayedExercises.length > 0 && (
+              <div id="scroll-sentinel" className="text-center py-8">
+                <div className="animate-pulse flex items-center justify-center gap-2 text-background-dark/60 dark:text-background-light/60">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <span className="ml-2 text-sm">Loading more exercises...</span>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
