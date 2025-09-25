@@ -10,6 +10,7 @@ import GroupWorkout from './pages/GroupWorkout'
 import Settings from './pages/Settings'
 import FriendsActivity from './pages/FriendsActivity'
 import Notifications from './pages/Notifications'
+import AddFriends from './pages/AddFriends'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/friends-activity" element={<FriendsActivity />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/add-friends" element={<AddFriends />} />
       </Routes>
     </Router>
   )

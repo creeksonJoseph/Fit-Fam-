@@ -1,62 +1,107 @@
 import React from 'react';
-import WorkoutCard from '../components/WorkoutCard';
-import Button from '../components/Button';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
 const Workouts = () => {
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+    <div className="bg-background-light dark:bg-background-dark font-display">
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="workouts" />
-        <main className="flex-1 p-8 pb-24 lg:pb-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-5xl font-extrabold text-gray-900 dark:text-white">Workouts</h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">Choose a workout to start your fitness journey.</p>
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-8 sm:mb-16 text-center">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-background-dark dark:text-background-light">Explore Exercises</h1>
+              <p className="mt-3 sm:mt-6 text-sm sm:text-lg text-background-dark/60 dark:text-background-light/60">
+                Find the perfect workout for your fitness goals. Browse our extensive library of exercises, categorized by body part and equipment.
+              </p>
             </div>
-            <div className="space-y-8">
-              <WorkoutCard 
-                image="https://lh3.googleusercontent.com/aida-public/AB6AXuCaHdPPbQupCC0VUs19DpeS3JlTAfMlCMRQxXSNsriHDah56Pl0sLb_Fb2OF__Q2eUJzENZrpRUX1KErvGKrTxpDXfI5k0MmIC5QoCYNxfyZflj5qvBwFDbnczpypzZOp-dusWSXPEPUKWl-j2iqhtjvy6l-ZvTkAiXzY9XIjRUW16HTSO8AF-Xp_aeqz8T7gOlOeCMjKevkr_J8yBAVEZAbSH58TwDvTRHN014FsItAAYtLR1D8itwKlsahViylVyDlk-B6pPmKVo"
-                duration="30 min"
-                title="Sunrise Yoga Flow"
-                description="A gentle yoga session to energize your morning and set a positive tone for the day."
-              />
-              <WorkoutCard 
-                image="https://lh3.googleusercontent.com/aida-public/AB6AXuAcq20-JfoaPiDMpS3z7hbqc26flOXIYoFf_cg3eW_mCw0pCF-6mWp2D2EO0tzCRU8TWZU-0UEQPyhpN1bJPZJNWFXY6IiS2Lme733yPEaTpGmG8SE7v7o_HS-Hj2HTDiA2H62SPWp2-YGd3usDd-WXabFXqnSYaofqLGueOMov_pTMfNdcYbUVVORPyNrst6YB6w_XPdPXLgAgTpLtvKjp7Rj8xDN63wSc5upraOi-XVUIFjf6xtXjNW5XlSk0nCBu6phs7MzHNE0"
-                duration="20 min"
-                title="High-Intensity Interval Training (HIIT)"
-                description="Short bursts of intense exercise followed by brief rest periods to maximize calorie burn."
-              />
-              <WorkoutCard 
-                image="https://lh3.googleusercontent.com/aida-public/AB6AXuAwLTLy5Wif10WegHVlmCKPIZXgOgENb-JHGp6i8YBva-KE-BtSAxFmWfPcOAwCh_oLXDhaQf3DaaYRL1c-PPsSBsyZXia4pvMVXMZTPBhBzZftqctcDxZxhi3-U3IUb1WYevRjsgVHnM340_mwLvZdDkMGgOjLIorZVZdx7F8XgfXTTbshy7pHdbmDTeX70WR3w4X-iW4o0JMZptfBROari_OM9ar2UtOBEJ3JSloAA5tSziHIdGoTs4dESbu_dIH_RUjmuUGal7g"
-                duration="45 min"
-                title="Strength Training Circuit"
-                description="Full-body workout focusing on building strength, endurance, and lean muscle mass."
+            
+            <div className="relative mb-6 sm:mb-10">
+              <svg className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 text-background-dark/40 dark:text-background-light/40" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+              <input 
+                className="w-full h-12 sm:h-16 pl-10 sm:pl-16 pr-4 sm:pr-6 rounded-lg bg-background-light dark:bg-background-dark border border-background-dark/10 dark:border-background-light/10 focus:ring-2 focus:ring-primary focus:outline-none transition-shadow text-sm sm:text-lg placeholder:text-background-dark/40 dark:placeholder:text-background-light/40" 
+                placeholder="Search exercises, e.g. 'bicep curl'" 
+                type="search"
               />
             </div>
-            <div className="mt-20 bg-background-light dark:bg-gray-900/50 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800">
-              <h3 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">Active Workout</h3>
-              <div className="flex justify-center items-center">
-                <div className="relative w-64 h-64 flex items-center justify-center">
-                  <svg className="absolute w-full h-full" viewBox="0 0 100 100">
-                    <circle className="text-gray-200 dark:text-gray-700" cx="50" cy="50" fill="transparent" r="45" stroke="currentColor" strokeWidth="8"></circle>
-                    <circle className="text-primary" cx="50" cy="50" fill="transparent" r="45" stroke="currentColor" strokeLinecap="round" strokeWidth="8" style={{strokeDasharray: '282.6', strokeDashoffset: '282.6'}}></circle>
-                  </svg>
-                  <div className="text-center">
-                    <p className="text-5xl font-bold text-gray-900 dark:text-white">24:15</p>
-                    <p className="text-gray-500 dark:text-gray-400">Time Remaining</p>
+            
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-16">
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-primary text-black">All</button>
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Arms</button>
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Legs</button>
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Core</button>
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Back</button>
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Chest</button>
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Shoulders</button>
+              <button className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-full bg-background-dark/5 dark:bg-background-light/10 text-background-dark dark:text-background-light hover:bg-background-dark/10 dark:hover:bg-background-light/20 transition-colors">Cardio</button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8">
+              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCzgOeCJyjHvXRL4t5uxX4b5YxID1we2e44RZbt_PSkIOHRjBAu5jK050f3qG6Uy03kMWfyd6u5oR7wPRozeBNPWtCCuOTP3quKE_usKxqaEFUcA5cEhcnG0Vs4oMwW0i-ib-JD28Xy1N5EUs_LeAAroQM9RmITmUXd8AKk97iTRAV-2j8900p361Fg5jIWbXiWUnRAGupWsPU7R3nhZ8Sm0Igmgpj4kPOD6I5eB4rgFWS1xB42-b_dRpxRrYax_NjngnHUkLT1umc")'}}></div>
+                <div className="p-3 sm:p-5 flex-grow">
+                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Bicep Curl</h3>
+                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Arms</p>
+                  <div className="flex items-center gap-2 sm:gap-4 mt-2 sm:mt-3">
+                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                      </svg>
+                      Dumbbell
+                    </span>
                   </div>
                 </div>
               </div>
-              <div className="mt-8 flex justify-center items-center gap-4">
-                <Button icon="play_arrow" className="w-32 h-12 shadow-md transform hover:scale-105">
-                  Start
-                </Button>
-                <Button variant="secondary" icon="stop" className="w-32 h-12 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                  Stop
-                </Button>
+              
+              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDndU82yVJrYY84KS-46QY_rSoq8aXYF_qgFV_UZLf0NvM8vojnMXemDeP1DJ6gChEXWF2xL_WSIzVyVuNjVs58JipSsdAMn16ZQQ2JY8ZJUOUFmzL-XmURKIfHKu91FuY3aecwBW9cUMWAelEyWO5dRgVxIlRMa3Ws0oiBsAQ6F48NJuZ9QX1MTaPrO2Ho3znms_awXQUz29d9cd8e4Mm4JzmqhydGbNgbVof5plbMC-dN4PV_mKLP_sYRw-Mh0eZBJAq-95gsAEQ")'}}></div>
+                <div className="p-3 sm:p-5 flex-grow">
+                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Squats</h3>
+                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Legs</p>
+                  <div className="flex items-center gap-2 sm:gap-4 mt-2 sm:mt-3">
+                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                      </svg>
+                      Barbell
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA630hdlp-NB_6wbo6vnJ4pWFZF8AupML3WG6H6TkUAGVwQHDpfgHGPTjCDmye5yNeBH84d7YE2khbHdOfGWmmkXsW3moiZrbKQ3Ngd9NqXcnRPQcCsqUmCMDyJ-uiF_C_DKsTxhAE8UaK34WFDTXTzJ3Nm6SGnrysFx1znOFdWy8pzF_pZIeIW3PILeIvpu14vvXCcI36zjSCDh8Ar-ILcrvPdwvIE3kiVM--l6I12s9RGjuX-eyO5aa3XLS8H9ROC1z8DOYKOP-g")'}}></div>
+                <div className="p-3 sm:p-5 flex-grow">
+                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Plank</h3>
+                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Core</p>
+                  <div className="flex items-center gap-2 sm:gap-4 mt-2 sm:mt-3">
+                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z" />
+                      </svg>
+                      Bodyweight
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="group flex flex-col bg-white dark:bg-background-dark/80 border border-background-dark/5 dark:border-background-light/10 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAJZSaag13CqpwFEK875O7UQNbmDPUFWhI1UciilI4VkwgZ-htB190Hyxn3jf2JOV9kVqOOunRp4NYU64ZyImdA5tfl10HyKguFzyXFcA3RRMzThk8lRA0c9ksEpSCw84i-7qPhVg9cU_g_Rdddg94PPN0qJLJfD9P9CS8bKYD9rRtZBMSD38d8Fuh-8iZBlCqBpsI0e_lK0wtzWHzoauLiBvCKGDqyVGKPUYT-GwoiZU7pTd5aZPwXkKebvKAwzIGLrQ-kWvc5x5o")'}}></div>
+                <div className="p-3 sm:p-5 flex-grow">
+                  <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light">Pull-ups</h3>
+                  <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50">Back</p>
+                  <div className="flex items-center gap-2 sm:gap-4 mt-2 sm:mt-3">
+                    <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-1.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z" />
+                      </svg>
+                      Bodyweight
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
