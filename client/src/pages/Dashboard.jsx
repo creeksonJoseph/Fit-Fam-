@@ -17,29 +17,16 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProgressData = async () => {
       try {
-        // Fetch user progress
+        // Fetch user workout stats
+        const statsRes = await fetch(`${BASE_URL}/workout-sessions/${userId}/stats`);
+        const stats = await statsRes.json();
+        
+        const totalWorkouts = stats.total_workouts || 0;
+        const avgDuration = stats.avg_duration || 0;
+        
+        // Fetch user progress for weekly calculation
         const progressRes = await fetch(`${BASE_URL}/progress/${userId}`);
         const userProgress = await progressRes.json();
-
-        // Calculate total workouts
-        const totalWorkouts = userProgress.length;
-
-        // Calculate average duration (from workout data)
-        let avgDuration = 0;
-        if (totalWorkouts > 0) {
-          const workoutIds = [
-            ...new Set(userProgress.map((p) => p.workout_id)),
-          ];
-          const workoutPromises = workoutIds.map((id) =>
-            fetch(`${BASE_URL}/workouts/${id}`).then((res) => res.json())
-          );
-          const workouts = await Promise.all(workoutPromises);
-          const totalDuration = workouts.reduce(
-            (sum, w) => sum + (w.duration || 0),
-            0
-          );
-          avgDuration = Math.round(totalDuration / workouts.length);
-        }
 
         // Calculate weekly progress (last 4 weeks)
         const now = new Date();

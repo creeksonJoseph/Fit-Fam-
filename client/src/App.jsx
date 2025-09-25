@@ -13,6 +13,8 @@ import Notifications from "./pages/Notifications";
 import AddFriends from "./pages/AddFriends";
 import WorkoutDetail from "./pages/WorkoutDetail";
 import WorkoutSession from "./pages/WorkoutSession";
+import WorkoutHistory from "./pages/WorkoutHistory";
+import WorkoutHistory from "./pages/WorkoutHistory";
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
         <Route path="/add-friends" element={<AddFriends />} />
         <Route path="/workout-detail/:id" element={<WorkoutDetail />} />
         <Route path="/workout-session/:id" element={<WorkoutSession />} />
+        <Route path="/workout-history" element={<WorkoutHistory />} />
+        <Route path="/workout-history" element={<WorkoutHistory />} />
       </Routes>
     </Router>
   );

@@ -51,13 +51,13 @@ class Workout(db.Model, SerializerMixin):
 class UserProgress(db.Model, SerializerMixin):
     __tablename__ = 'user_progress'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    workout_id = db.Column(db.Integer, db.ForeignKey('workouts.id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    workout_id = db.Column(db.Integer, db.ForeignKey('workouts.id'), nullable=False)
     progress = db.Column(db.String, nullable=False)
     time_completed = db.Column(
         db.DateTime,
         server_default=text('CURRENT_TIMESTAMP'),
-        onupdate=text('CURRENT_TIMESTAMP'),
         nullable=False
     )
     notes = db.Column(db.String, nullable=True)
@@ -66,7 +66,7 @@ class UserProgress(db.Model, SerializerMixin):
     user = db.relationship("User", back_populates="progress")
     workout = db.relationship("Workout", back_populates="progress")
 
-    serialize_only = ("user_id", "workout_id", "progress", "time_completed", "notes")
+    serialize_only = ("id", "user_id", "workout_id", "progress", "time_completed", "notes")
 
 
 class Friends(db.Model, SerializerMixin):

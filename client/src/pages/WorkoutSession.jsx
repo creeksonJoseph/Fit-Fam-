@@ -34,8 +34,42 @@ const WorkoutSession = () => {
     }
   };
 
-  const handleSave = () => {
-    alert('Workout saved! (Backend implementation pending)');
+  const handleSave = async () => {
+    if (!hasStarted || !exercise) return;
+    
+    try {
+      const workoutData = {
+        user_id: 1, // TODO: Get from auth context
+        exercise_id: exercise.id,
+        exercise_name: exercise.name,
+        duration: Math.floor(time / 60), // Convert seconds to minutes
+        description: `${exercise.target} exercise using ${exercise.equipment}`,
+        bodyPart: exercise.bodyPart,
+        equipment: exercise.equipment,
+        target: exercise.target
+      };
+      
+      const response = await fetch('https://group-fitness-app-db.onrender.com/workout-sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(workoutData)
+      });
+      
+      if (response.ok) {
+        alert('Workout saved successfully!');
+        // Reset timer and state
+        setTime(0);
+        setIsRunning(false);
+        setHasStarted(false);
+      } else {
+        throw new Error('Failed to save workout');
+      }
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      alert('Failed to save workout. Please try again.');
+    }
   };
 
   useEffect(() => {

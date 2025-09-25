@@ -188,7 +188,15 @@ const Workouts = () => {
         <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="mx-auto max-w-5xl">
             <div className="mb-8 sm:mb-16 text-center">
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-background-dark dark:text-background-light">Explore Exercises</h1>
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-background-dark dark:text-background-light">Explore Exercises</h1>
+                <Link 
+                  to="/workout-history" 
+                  className="bg-primary text-black px-4 py-2 rounded-lg font-bold hover:bg-primary/90 transition-colors"
+                >
+                  View History
+                </Link>
+              </div>
               <p className="mt-3 sm:mt-6 text-sm sm:text-lg text-background-dark/60 dark:text-background-light/60">
                 Find the perfect workout for your fitness goals. Browse our extensive library of exercises, categorized by body part and equipment.
               </p>
