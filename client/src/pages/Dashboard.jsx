@@ -31,7 +31,7 @@ const Dashboard = () => {
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Friends Active Now</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">3 friends are working out</p>
-                    <Link className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors inline-block" to="/friends">View</Link>
+                    <Link className="bg-primary/20 dark:bg-primary/30 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors inline-block" to="/friends-activity">View</Link>
                   </div>
                   <div className="w-32 h-32 rounded-lg bg-cover bg-center" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAbekwa8x5SOy8tggCWbMxg4mmipEOD2KPcwt6Cdk2XylucxcS8O6WsTo95UhQewXIn2gUSrmNMp_b6IDP6WKKZFfIwrZIxyC3eKT1TDmqpGhrXcf6h_VRuFb-CUC-ZWvRcuep-NtizbgptYYFLMwBybFk0gm1JscXOMVF-797usDswtMSTaweV0SyMSuncpI-6p-6QpI08UZtFdkcMgktn3paWAPBuqjwVu3Y8eXrWqVOdviciC2pQgwJH4vmMxbPpXtuNj96f56A")'}}></div>
                 </div>

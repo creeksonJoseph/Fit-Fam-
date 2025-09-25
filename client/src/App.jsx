@@ -8,6 +8,8 @@ import Workouts from './pages/Workouts'
 import MyProgress from './pages/MyProgress'
 import GroupWorkout from './pages/GroupWorkout'
 import Settings from './pages/Settings'
+import FriendsActivity from './pages/FriendsActivity'
+import Notifications from './pages/Notifications'
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/my-progress" element={<MyProgress />} />
         <Route path="/group-workout" element={<GroupWorkout />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/friends-activity" element={<FriendsActivity />} />
+        <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </Router>
   )

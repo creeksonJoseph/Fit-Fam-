@@ -6,7 +6,7 @@ const Sidebar = ({ activeTab = "" }) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex sticky top-0 h-screen w-80 bg-background-light dark:bg-background-dark p-6 flex-col justify-between border-r border-primary/20 dark:border-primary/30">
+      <aside className="hidden lg:flex sticky top-0 h-[100vh] w-80 bg-background-light dark:bg-background-dark p-6 flex-col justify-between border-r border-primary/20 dark:border-primary/30 overflow-y-auto">
       <div className="flex flex-col gap-8">
         <nav className="flex flex-col gap-2">
           <Link
