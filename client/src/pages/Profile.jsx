@@ -1,12 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
 
-const Settings = () => {
+const Profile = () => {
+  const navigate = useNavigate();
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [username, setUsername] = useState("SunriseChaser");
-  const [email, setEmail] = useState("sunrise.chaser@email.com");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+  
+  const BASE_URL = 'https://group-fitness-app-db.onrender.com';
+  const userId = 1;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/users`);
+        const users = await response.json();
+        const currentUser = users.find(user => user.id === userId);
+        
+        if (currentUser) {
+          setUsername(currentUser.username);
+          setEmail(currentUser.email);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, []);
+  
+  const handleSaveUsername = async () => {
+    try {
+      await fetch(`${BASE_URL}/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      });
+      setIsEditingUsername(false);
+    } catch (error) {
+      console.error('Error updating username:', error);
+    }
+  };
+  
+  const handleSaveEmail = async () => {
+    try {
+      await fetch(`${BASE_URL}/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      setIsEditingEmail(false);
+    } catch (error) {
+      console.error('Error updating email:', error);
+    }
+  };
+  
+  if (loading) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="settings" />
+          <main className="flex-1 flex items-center justify-center lg:ml-80">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background-light dark:bg-background-dark font-display">
@@ -81,7 +148,10 @@ const Settings = () => {
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>
-                      <button className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80">
+                      <button 
+                        onClick={handleSaveUsername}
+                        className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80"
+                      >
                         Save
                       </button>
                     </div>
@@ -119,7 +189,10 @@ const Settings = () => {
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>
-                      <button className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80">
+                      <button 
+                        onClick={handleSaveEmail}
+                        className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80"
+                      >
                         Save
                       </button>
                     </div>
@@ -127,7 +200,10 @@ const Settings = () => {
                 </div>
               </div>
               <div className="mt-8">
-                <button className="w-full h-12 bg-background-light dark:bg-background-dark/50 text-background-dark dark:text-white font-bold text-lg rounded-xl hover:bg-primary/20 dark:hover:bg-primary/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark focus:ring-primary transition-colors duration-200">
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="lg:hidden px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200 self-start"
+                >
                   Log Out
                 </button>
               </div>
@@ -139,4 +215,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default Profile;
