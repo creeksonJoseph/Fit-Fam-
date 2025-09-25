@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import AppHeader from '../components/AppHeader';
 
 const Dashboard = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+      <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="dashboard" />
         <main className="flex-1 p-8">

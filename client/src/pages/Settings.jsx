@@ -2,10 +2,12 @@ import React from "react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Sidebar from "../components/Sidebar";
+import AppHeader from "../components/AppHeader";
 
 const Settings = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display">
+      <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="settings" />
         <main className="flex-1 p-8">

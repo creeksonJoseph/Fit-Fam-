@@ -1,9 +1,11 @@
 import React from 'react';
 import Sidebar from '../components/Sidebar';
+import AppHeader from '../components/AppHeader';
 
 const MyProgress = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-[#111827] dark:text-white">
+      <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="progress" />
         <main className="flex-1 p-8">

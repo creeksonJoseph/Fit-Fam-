@@ -1,9 +1,11 @@
 import React from 'react';
 import Sidebar from '../components/Sidebar';
+import AppHeader from '../components/AppHeader';
 
 const Friends = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+      <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="friends" />
         <main className="flex-1 p-8">

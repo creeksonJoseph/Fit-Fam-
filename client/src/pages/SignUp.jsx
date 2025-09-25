@@ -28,7 +28,7 @@ export default function SignUp() {
   };
   return (
     <div className="bg-background-light dark:bg-background-dark font-display min-h-screen">
-      <AppHeader isAuthenticated={false} showAuthButtons={true} />
+      <AppHeader isAuthenticated={false} showAuthButtons={true} currentPage="signup" />
       <div className="flex flex-col min-h-screen">
       <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row w-full max-w-4xl mx-auto">
