@@ -1,25 +1,52 @@
-from flask import Flask, request, jsonify, session
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_restful import Api,Resource
+from flask_restful import Api
+from flask_migrate import Migrate
 from models import db
-from routes import User_routes, Workout_routes, Progress_routes, Friends_routes
 
-app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fitness_app.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret_key'
-app.config['SESSION_TYPE'] = 'filesystem'
+from routes.User_routes import user_bp
+from routes.Workout_routes import workout_bp
+from routes.Progress_routes import progress_bp
+from routes.Friends_routes import friends_bp
 
 
-CORS(app)
-api = Api(app)
-db.init_app(app)
-app.register_blueprint(User_routes, url_prefix='/users')
-app.register_blueprint(Workout_routes, url_prefix='/workouts')
-app.register_blueprint(Progress_routes, url_prefix='/progress')
-app.register_blueprint(Friends_routes, url_prefix='/friends')
+def create_app():
+    app = Flask(__name__)
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+        "DATABASE_URL", "sqlite:///fitness_app.db"
+    )
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret")
+
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    if not app.debug: 
+        app.config['SESSION_COOKIE_SECURE'] = True
+
+    db.init_app(app)
+    CORS(app)
+    Api(app)
+    Migrate(app, db)
+
+    app.register_blueprint(user_bp, url_prefix="/users")
+    app.register_blueprint(workout_bp, url_prefix="/workouts")
+    app.register_blueprint(progress_bp, url_prefix="/progress")
+    app.register_blueprint(friends_bp, url_prefix="/friends")
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return jsonify({"error": "Not Found"}), 404
+
+    @app.errorhandler(500)
+    def server_error(e):
+        return jsonify({"error": "Internal Server Error"}), 500
+
+    return app
 
 
-if __name__ == '__main__':
+app = create_app()
+
+if __name__ == "__main__":
     app.run(debug=True)

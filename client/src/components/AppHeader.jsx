@@ -2,50 +2,80 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Logo from "./Logo";
 
-const AppHeader = ({ activeTab = "" }) => {
+const AppHeader = ({ activeTab = "", isAuthenticated = false, showAuthButtons = false, currentPage = "" }) => {
   return (
-    <header className="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm flex items-center justify-between px-6 sm:px-10 py-4 border-b border-primary/20 dark:border-primary/30">
-      <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm flex items-center justify-between px-3 sm:px-6 lg:px-10 py-2 sm:py-3 lg:py-4 border-b border-primary/20 dark:border-primary/30">
+      <div className="flex items-center gap-2 sm:gap-4">
         <Logo />
-        <h1 className="text-2xl font-bold text-black dark:text-white">
+        <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-black dark:text-white">
           FitFam
         </h1>
       </div>
-      <nav className="hidden md:flex items-center gap-8">
-        <Link
-          className={`text-sm font-medium transition-colors ${activeTab === "dashboard" ? "text-primary" : "hover:text-primary"}`}
-          to="/dashboard"
-        >
-          Dashboard
-        </Link>
-        <Link
-          className={`text-sm font-medium transition-colors ${activeTab === "workouts" ? "text-primary" : "hover:text-primary"}`}
-          to="/workouts"
-        >
-          Workouts
-        </Link>
-        <Link
-          className={`text-sm font-medium transition-colors ${activeTab === "progress" ? "text-primary" : "hover:text-primary"}`}
-          to="/my-progress"
-        >
-          Progress
-        </Link>
-        <Link
-          className={`text-sm font-medium transition-colors ${activeTab === "community" ? "text-primary" : "hover:text-primary"}`}
-          to="/friends"
-        >
-          Community
-        </Link>
-      </nav>
-      <div className="flex items-center gap-4">
-        <button className="p-2 rounded-full hover:bg-primary/20 transition-colors">
-          <span className="material-symbols-outlined">notifications</span>
-        </button>
-        <img
-          alt="User profile picture"
-          className="size-10 rounded-full"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjBAiY897rpaTFp4mHtCAPQBZ87TuHT4vgxR7Ns8ngFqtr2Mb6fwqFeR07RAfFRgmuGaiv6H23_1k_eYB1qkB1X0ngxsf5iBoBI691n5ptCe4srwZLQz9EuUP2C4FouF56Up474O-keNQoMnCmOYX5bNooy6c3OB3egxOUt9SX3kNtvju7VOjCSkvyUGYE3x-EEkaixk_W68m30er5iuVM7m9zS4QkC0qcJtv5FiDgfGQNmKtTW8XA-_yjeg6BPe12W4SDt4H7BDE"
-        />
+      
+      <div className="flex items-center gap-2 sm:gap-4">
+        {showAuthButtons ? (
+          <>
+            {currentPage === "login" ? (
+              <>
+                <Link
+                  className="px-3 py-1.5 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors"
+                  to="/"
+                >
+                  Home
+                </Link>
+                <Link
+                  className="px-3 py-1.5 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors"
+                  to="/signup"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : currentPage === "signup" ? (
+              <>
+                <Link
+                  className="px-3 py-1.5 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors"
+                  to="/"
+                >
+                  Home
+                </Link>
+                <Link
+                  className="px-3 py-1.5 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors"
+                  to="/login"
+                >
+                  Login
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  className="px-3 py-1.5 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-transparent border-2 border-primary hover:bg-primary/20 transition-colors"
+                  to="/login"
+                >
+                  Login
+                </Link>
+                <Link
+                  className="px-3 py-1.5 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-primary text-background-dark hover:bg-opacity-90 transition-colors"
+                  to="/signup"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <button className="p-1.5 sm:p-2 rounded-full hover:bg-primary/20 transition-colors">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-background-dark dark:text-background-light" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+              </svg>
+            </button>
+            <Link to="/settings" className="p-1.5 sm:p-2 rounded-full hover:bg-primary/20 transition-colors">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-background-dark dark:text-background-light" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
+            </Link>
+          </>
+        )}
       </div>
     </header>
   );

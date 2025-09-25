@@ -1,13 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import AppHeader from '../components/AppHeader';
 
 const Dashboard = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+      <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="dashboard" />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8">
           <header className="mb-10">
             <h1 className="text-4xl font-black text-gray-900 dark:text-white">Welcome back, Sophia</h1>
           </header>

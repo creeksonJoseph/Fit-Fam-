@@ -2,13 +2,15 @@ import React from 'react';
 import WorkoutCard from '../components/WorkoutCard';
 import Button from '../components/Button';
 import Sidebar from '../components/Sidebar';
+import AppHeader from '../components/AppHeader';
 
 const Workouts = () => {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+      <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="workouts" />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-5xl font-extrabold text-gray-900 dark:text-white">Workouts</h2>
