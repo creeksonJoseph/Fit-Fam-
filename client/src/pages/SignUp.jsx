@@ -30,7 +30,7 @@ export default function SignUp() {
     <div className="bg-background-light dark:bg-background-dark font-display min-h-screen">
       <AppHeader isAuthenticated={false} showAuthButtons={true} currentPage="signup" />
       <div className="flex flex-col min-h-screen">
-      <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <main className="flex-grow flex items-center justify-center py-4 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row w-full max-w-4xl mx-auto">
           <div className="lg:w-1/2 hidden lg:block">
             <img
@@ -39,20 +39,20 @@ export default function SignUp() {
               src="bruce-mars.jpg"
             />
           </div>
-          <div className="w-full lg:w-1/2 space-y-8">
-            <div className="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-8 shadow-xl rounded-r-xl h-full flex flex-col justify-center">
+          <div className="w-full lg:w-1/2 space-y-4 lg:space-y-8">
+            <div className="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4 sm:p-6 lg:p-8 shadow-xl rounded-xl lg:rounded-r-xl h-full flex flex-col justify-center">
               <div>
-                <h1 className="text-center text-4xl font-black text-background-dark dark:text-background-light">
+                <h1 className="text-center text-2xl sm:text-3xl lg:text-4xl font-black text-background-dark dark:text-background-light">
                   Rise and Shine
                 </h1>
-                <h2 className="mt-4 text-center text-3xl font-bold tracking-tight text-background-dark dark:text-background-light">
+                <h2 className="mt-2 lg:mt-4 text-center text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-background-dark dark:text-background-light">
                   Create your account
                 </h2>
-                <p className="mt-2 text-center text-sm text-background-dark/70 dark:text-background-light/70">
+                <p className="mt-1 lg:mt-2 text-center text-xs sm:text-sm text-background-dark/70 dark:text-background-light/70">
                   Join our community and start your fitness journey today.
                 </p>
               </div>
-              <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+              <form className="mt-4 lg:mt-8 space-y-4 lg:space-y-6" onSubmit={handleSubmit}>
 
                 <div>
                   <label className="sr-only" htmlFor="email-address">
@@ -60,7 +60,7 @@ export default function SignUp() {
                   </label>
                   <input
                     autoComplete="email"
-                    className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-primary/20 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-base"
+                    className="appearance-none rounded-lg relative block w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-primary/20 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-sm sm:text-base"
                     id="email-address"
                     name="email"
                     placeholder="Email address"
@@ -74,7 +74,7 @@ export default function SignUp() {
                   </label>
                   <input
                     autoComplete="new-password"
-                    className={`appearance-none rounded-lg relative block w-full px-4 py-3 pr-12 border-2 transition-all duration-300 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-base ${
+                    className={`appearance-none rounded-lg relative block w-full px-3 py-2 sm:px-4 sm:py-3 pr-10 sm:pr-12 border-2 transition-all duration-300 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-sm sm:text-base ${
                       password && isPasswordValid
                         ? "border-green-500 shadow-green-500/20 shadow-lg focus:ring-green-500 focus:border-green-500"
                         : password
@@ -166,7 +166,7 @@ export default function SignUp() {
                   </label>
                   <input
                     autoComplete="new-password"
-                    className={`appearance-none rounded-lg relative block w-full px-4 py-3 pr-12 border-2 transition-all duration-300 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-base ${
+                    className={`appearance-none rounded-lg relative block w-full px-3 py-2 sm:px-4 sm:py-3 pr-10 sm:pr-12 border-2 transition-all duration-300 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-sm sm:text-base ${
                       confirmPassword && passwordsMatch
                         ? "border-green-500 shadow-green-500/20 shadow-lg focus:ring-green-500 focus:border-green-500"
                         : confirmPassword && !passwordsMatch
@@ -212,7 +212,7 @@ export default function SignUp() {
                 </div>
                 <div>
                   <button
-                    className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-bold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark ${
+                    className={`group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-bold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark ${
                       canSubmit
                         ? "text-background-dark bg-primary hover:bg-primary/90 focus:ring-primary cursor-pointer"
                         : "text-background-dark/50 dark:text-background-light/50 bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
@@ -224,8 +224,8 @@ export default function SignUp() {
                   </button>
                 </div>
               </form>
-              <div className="mt-6 text-center">
-                <p className="text-sm text-background-dark/70 dark:text-background-light/70">
+              <div className="mt-4 lg:mt-6 text-center">
+                <p className="text-xs sm:text-sm text-background-dark/70 dark:text-background-light/70">
                   Already have an account?{" "}
                   <Link
                     to="/login"

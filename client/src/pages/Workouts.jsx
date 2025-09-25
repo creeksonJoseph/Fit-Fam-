@@ -10,7 +10,7 @@ const Workouts = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="workouts" />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-5xl font-extrabold text-gray-900 dark:text-white">Workouts</h2>

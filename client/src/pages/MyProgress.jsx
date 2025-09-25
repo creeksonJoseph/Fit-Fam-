@@ -8,7 +8,7 @@ const MyProgress = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="progress" />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8">
             <div className="mx-auto max-w-5xl">
               <div className="mb-12">
                 <h1 className="text-5xl font-bold text-background-dark dark:text-white">My Progress</h1>

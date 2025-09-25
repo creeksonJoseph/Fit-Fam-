@@ -8,7 +8,7 @@ const Friends = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="friends" />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8">
           <header className="mb-10">
             <h1 className="text-4xl font-black text-gray-900 dark:text-white">Friends</h1>
           </header>
