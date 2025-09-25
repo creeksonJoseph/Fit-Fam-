@@ -9,21 +9,21 @@ const Friends = () => {
       <div className="flex min-h-screen">
         <Sidebar activeTab="friends" />
         <main className="flex-1 p-8 pb-24 lg:pb-8">
-          <header className="mb-10">
+          <div className="flex justify-between items-center mb-10">
             <h1 className="text-4xl font-black text-gray-900 dark:text-white">Friends</h1>
-          </header>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <button className="bg-primary text-black font-bold py-2 px-6 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-all">
-              <span className="material-symbols-outlined">person_add</span>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+              </svg>
               <span>Add Friend</span>
             </button>
           </div>
 
           <div className="mb-12">
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50">
-                search
-              </span>
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black/50 dark:text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
               <input
                 className="w-full bg-white dark:bg-background-dark border border-primary/20 dark:border-primary/30 rounded-lg py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-black/50 dark:placeholder:text-white/50"
                 placeholder="Search by username..."
@@ -108,13 +108,17 @@ const Friends = () => {
                       className="bg-primary text-black p-2 rounded-full hover:bg-opacity-80 transition-opacity"
                       aria-label="Accept request"
                     >
-                      <span className="material-symbols-outlined">check</span>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
                     </button>
                     <button
                       className="bg-background-light dark:bg-background-dark/80 text-black dark:text-white p-2 rounded-full hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors"
                       aria-label="Decline request"
                     >
-                      <span className="material-symbols-outlined">close</span>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -138,13 +142,17 @@ const Friends = () => {
                       className="bg-primary text-black p-2 rounded-full hover:bg-opacity-80 transition-opacity"
                       aria-label="Accept request"
                     >
-                      <span className="material-symbols-outlined">check</span>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
                     </button>
                     <button
                       className="bg-background-light dark:bg-background-dark/80 text-black dark:text-white p-2 rounded-full hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors"
                       aria-label="Decline request"
                     >
-                      <span className="material-symbols-outlined">close</span>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
                     </button>
                   </div>
                 </div>
