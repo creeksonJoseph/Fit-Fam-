@@ -9,6 +9,7 @@ from routes.User_routes import user_bp
 from routes.Workout_routes import workout_bp
 from routes.Progress_routes import progress_bp
 from routes.Friends_routes import friends_bp
+from workout_routes import workout_bp as workout_session_bp
 
 
 def create_app():
@@ -34,6 +35,7 @@ def create_app():
     app.register_blueprint(workout_bp, url_prefix="/workouts")
     app.register_blueprint(progress_bp, url_prefix="/progress")
     app.register_blueprint(friends_bp, url_prefix="/friends")
+    app.register_blueprint(workout_session_bp)
 
     @app.errorhandler(404)
     def not_found(e):
@@ -47,6 +49,10 @@ def create_app():
 
 
 app = create_app()
+
+# Create tables if they don't exist
+with app.app_context():
+    db.create_all()
 
 if __name__ == "__main__":
     app.run(debug=True)

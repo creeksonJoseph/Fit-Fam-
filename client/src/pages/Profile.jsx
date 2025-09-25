@@ -1,22 +1,89 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
 
-const Settings = () => {
+const Profile = () => {
+  const navigate = useNavigate();
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [username, setUsername] = useState("SunriseChaser");
-  const [email, setEmail] = useState("sunrise.chaser@email.com");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+  
+  const BASE_URL = 'https://group-fitness-app-db.onrender.com';
+  const userId = 1;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/users`);
+        const users = await response.json();
+        const currentUser = users.find(user => user.id === userId);
+        
+        if (currentUser) {
+          setUsername(currentUser.username);
+          setEmail(currentUser.email);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, []);
+  
+  const handleSaveUsername = async () => {
+    try {
+      await fetch(`${BASE_URL}/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      });
+      setIsEditingUsername(false);
+    } catch (error) {
+      console.error('Error updating username:', error);
+    }
+  };
+  
+  const handleSaveEmail = async () => {
+    try {
+      await fetch(`${BASE_URL}/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      setIsEditingEmail(false);
+    } catch (error) {
+      console.error('Error updating email:', error);
+    }
+  };
+  
+  if (loading) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="settings" />
+          <main className="flex-1 flex items-center justify-center lg:ml-80">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background-light dark:bg-background-dark font-display">
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="settings" />
-        <main className="flex-1 p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold text-background-dark dark:text-white mb-8">
-              Settings
+              Profile
             </h2>
             <div className="space-y-8">
               <div className="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
@@ -42,12 +109,17 @@ const Settings = () => {
                     </button>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-background-dark dark:text-white">{username}</h3>
+                    <h3 className="text-2xl font-bold text-background-dark dark:text-white">
+                      {username}
+                    </h3>
                   </div>
                 </div>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-background-dark/70 dark:text-white/70" htmlFor="username">
+                    <label
+                      className="block text-sm font-medium text-background-dark/70 dark:text-white/70"
+                      htmlFor="username"
+                    >
                       Change Username
                     </label>
                     <div className="flex items-center gap-4">
@@ -62,21 +134,33 @@ const Settings = () => {
                           onChange={(e) => setUsername(e.target.value)}
                         />
                       </div>
-                      <button 
+                      <button
                         className="p-3 rounded-lg bg-background-light dark:bg-background-dark/60 text-background-dark dark:text-white hover:bg-primary/20 dark:hover:bg-primary/30"
                         onClick={() => setIsEditingUsername(!isEditingUsername)}
                       >
-                        <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="currentColor"
+                          height="20"
+                          viewBox="0 0 256 256"
+                          width="20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>
-                      <button className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80">
+                      <button 
+                        onClick={handleSaveUsername}
+                        className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80"
+                      >
                         Save
                       </button>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-background-dark/70 dark:text-white/70" htmlFor="email">
+                    <label
+                      className="block text-sm font-medium text-background-dark/70 dark:text-white/70"
+                      htmlFor="email"
+                    >
                       Change Email
                     </label>
                     <div className="flex items-center gap-4">
@@ -91,15 +175,24 @@ const Settings = () => {
                           onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
-                      <button 
+                      <button
                         className="p-3 rounded-lg bg-background-light dark:bg-background-dark/60 text-background-dark dark:text-white hover:bg-primary/20 dark:hover:bg-primary/30"
                         onClick={() => setIsEditingEmail(!isEditingEmail)}
                       >
-                        <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="currentColor"
+                          height="20"
+                          viewBox="0 0 256 256"
+                          width="20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>
-                      <button className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80">
+                      <button 
+                        onClick={handleSaveEmail}
+                        className="px-4 py-2.5 rounded-lg bg-primary text-background-dark font-bold hover:bg-primary/80"
+                      >
                         Save
                       </button>
                     </div>
@@ -107,7 +200,10 @@ const Settings = () => {
                 </div>
               </div>
               <div className="mt-8">
-                <button className="w-full h-12 bg-background-light dark:bg-background-dark/50 text-background-dark dark:text-white font-bold text-lg rounded-xl hover:bg-primary/20 dark:hover:bg-primary/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark focus:ring-primary transition-colors duration-200">
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="lg:hidden px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200 self-start"
+                >
                   Log Out
                 </button>
               </div>
@@ -119,4 +215,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default Profile;
