@@ -1,9 +1,77 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
 const WorkoutSession = () => {
+  const { id } = useParams();
+  const [exercise, setExercise] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const BASE_URL = 'https://fit-fam-server.onrender.com';
+
+  useEffect(() => {
+    const fetchExercise = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/exercises/${id}`);
+        const data = await response.json();
+        const mappedExercise = {
+          id: data.exerciseId,
+          name: data.name,
+          bodyPart: data.bodyParts?.[0] || 'unknown',
+          equipment: data.equipments?.[0] || 'unknown',
+          target: data.targetMuscles?.[0] || 'unknown',
+          gifUrl: data.gifUrl,
+          instructions: data.instructions || [],
+          secondaryMuscles: data.secondaryMuscles || []
+        };
+        setExercise(mappedExercise);
+      } catch (error) {
+        console.error('Error fetching exercise:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchExercise();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="workouts" />
+          <main className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-background-dark dark:text-background-light">Loading workout...</p>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (!exercise) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="workouts" />
+          <main className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-background-dark dark:text-background-light">Workout not found</p>
+              <Link to="/workouts" className="mt-4 inline-block bg-primary text-black px-4 py-2 rounded-lg">Back to Workouts</Link>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background-light dark:bg-background-dark font-display">
       <AppHeader />
@@ -12,7 +80,7 @@ const WorkoutSession = () => {
         <main className="flex-1 flex items-center justify-center p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
           <div className="mx-auto w-full max-w-2xl text-center">
             <Link 
-              to="/workout-detail" 
+              to={`/workout-detail/${id}`} 
               className="inline-flex items-center gap-1 sm:gap-2 mb-6 sm:mb-8 text-sm sm:text-base text-background-dark dark:text-background-light hover:text-primary transition-colors"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -22,8 +90,8 @@ const WorkoutSession = () => {
               <span className="sm:hidden">Back</span>
             </Link>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-background-dark dark:text-background-light">
-              Morning Yoga Flow
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-background-dark dark:text-background-light capitalize">
+              {exercise.name}
             </h1>
             <p className="mt-3 sm:mt-4 text-sm sm:text-lg text-background-dark/60 dark:text-background-light/60">
               Focus on your breath and flow through each pose with intention. Remember to listen to your body and modify as needed.

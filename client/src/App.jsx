@@ -30,8 +30,8 @@ function App() {
         <Route path="/friends-activity" element={<FriendsActivity />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/add-friends" element={<AddFriends />} />
-        <Route path="/workout-detail" element={<WorkoutDetail />} />
-        <Route path="/workout-session" element={<WorkoutSession />} />
+        <Route path="/workout-detail/:id" element={<WorkoutDetail />} />
+        <Route path="/workout-session/:id" element={<WorkoutSession />} />
       </Routes>
     </Router>
   )
