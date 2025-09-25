@@ -111,7 +111,7 @@ const Workouts = () => {
                       Bodyweight
                     </span>
                     <Link to="/workout-detail" className="px-3 py-1.5 text-xs sm:text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
-                      Try it out
+                      Grind
                     </Link>
                   </div>
                 </div>

@@ -12,6 +12,7 @@ import FriendsActivity from './pages/FriendsActivity'
 import Notifications from './pages/Notifications'
 import AddFriends from './pages/AddFriends'
 import WorkoutDetail from './pages/WorkoutDetail'
+import WorkoutSession from './pages/WorkoutSession'
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/add-friends" element={<AddFriends />} />
         <Route path="/workout-detail" element={<WorkoutDetail />} />
+        <Route path="/workout-session" element={<WorkoutSession />} />
       </Routes>
     </Router>
   )

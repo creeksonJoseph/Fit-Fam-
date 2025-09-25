@@ -72,9 +72,9 @@ const WorkoutDetail = () => {
             </div>
 
             <div className="text-center pt-6 sm:pt-8">
-              <button className="inline-block bg-primary text-black font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-lg text-base sm:text-lg hover:bg-primary/90 transition-all transform hover:scale-105 shadow-lg">
+              <Link to="/workout-session" className="inline-block bg-primary text-black font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-lg text-base sm:text-lg hover:bg-primary/90 transition-all transform hover:scale-105 shadow-lg">
                 Start Workout
-              </button>
+              </Link>
             </div>
           </div>
         </main>
