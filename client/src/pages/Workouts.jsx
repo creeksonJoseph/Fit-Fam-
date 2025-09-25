@@ -17,38 +17,7 @@ const Workouts = () => {
 
   const BASE_URL = 'https://fit-fam-server.onrender.com';
 
-  // Fallback data for when API is unavailable
-  const fallbackExercises = [
-    {
-      id: '1',
-      name: 'push up',
-      bodyPart: 'chest',
-      equipment: 'body weight',
-      target: 'pectorals',
-      gifUrl: 'https://v2.exercisedb.io/image/BQSKkc-9nul0Cg',
-      instructions: ['Start in plank position', 'Lower body to ground', 'Push back up']
-    },
-    {
-      id: '2',
-      name: 'squat',
-      bodyPart: 'legs',
-      equipment: 'body weight',
-      target: 'quadriceps',
-      gifUrl: 'https://v2.exercisedb.io/image/BQSKkc-9nul0Cg',
-      instructions: ['Stand with feet apart', 'Lower into squat', 'Return to standing']
-    },
-    {
-      id: '3',
-      name: 'plank',
-      bodyPart: 'core',
-      equipment: 'body weight',
-      target: 'abs',
-      gifUrl: 'https://v2.exercisedb.io/image/BQSKkc-9nul0Cg',
-      instructions: ['Hold plank position', 'Keep body straight', 'Breathe steadily']
-    }
-  ];
 
-  const fallbackBodyParts = ['chest', 'legs', 'core', 'back', 'shoulders', 'arms', 'cardio'];
 
   const fetchAllExercises = async () => {
     // Check localStorage first
@@ -59,34 +28,20 @@ const Workouts = () => {
     if (cachedExercises && cachedTimestamp) {
       const isExpired = Date.now() - parseInt(cachedTimestamp) > ONE_DAY;
       if (!isExpired) {
-        console.log('📦 Using cached exercises from localStorage');
+
         const exercises = JSON.parse(cachedExercises);
         return exercises;
       }
     }
     
-    console.log('🚀 Fetching ALL exercises from API...');
     try {
-      console.log('📡 Making request to:', `${BASE_URL}/exercises`);
-      
       const response = await fetch(`${BASE_URL}/exercises`);
       
-      console.log('📊 Response status:', response.status);
-      
-      if (response.status === 429) {
-        console.warn('⚠️ API rate limit reached, using fallback data');
-        return fallbackExercises;
-      }
-      
       if (!response.ok) {
-        console.error('❌ API response not ok:', response.status);
-        return fallbackExercises;
+        return [];
       }
       
       const data = await response.json();
-      console.log('✅ Fetched', data.length, 'exercises from API');
-      console.log('📋 Sample exercise data:', data[0]);
-      console.log('🔍 Response headers:', Object.fromEntries(response.headers.entries()));
       
       const exercises = Array.isArray(data) ? data.map(exercise => ({
         id: exercise.exerciseId,
@@ -96,68 +51,62 @@ const Workouts = () => {
         target: exercise.targetMuscles?.[0] || 'unknown',
         gifUrl: exercise.gifUrl,
         instructions: exercise.instructions || []
-      })) : fallbackExercises;
+      })) : [];
       
       // Cache in localStorage
       localStorage.setItem('exercises', JSON.stringify(exercises));
       localStorage.setItem('exercises_timestamp', Date.now().toString());
-      console.log('💾 Cached exercises to localStorage');
       
       return exercises;
     } catch (error) {
-      console.error('🔥 Network error:', error.message);
-      return fallbackExercises;
+      return [];
     }
   };
 
   const fetchBodyParts = async () => {
-    console.log('🚀 Starting to fetch body parts from API...');
-    try {
-      console.log('📡 Making request to:', `${BASE_URL}/bodyparts`);
-      
-      const response = await fetch(`${BASE_URL}/bodyparts`);
-      
-      console.log('📊 Body parts response status:', response.status);
-      console.log('📊 Body parts response ok:', response.ok);
-      
-      if (response.status === 429) {
-        console.warn('⚠️ API rate limit reached (429) for body parts, using fallback data');
-        setBodyParts(fallbackBodyParts);
+    // Check localStorage first
+    const cachedBodyParts = localStorage.getItem('bodyparts');
+    const cachedTimestamp = localStorage.getItem('bodyparts_timestamp');
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    
+    if (cachedBodyParts && cachedTimestamp) {
+      const isExpired = Date.now() - parseInt(cachedTimestamp) > ONE_DAY;
+      if (!isExpired) {
+
+        const bodyParts = JSON.parse(cachedBodyParts);
+        setBodyParts(bodyParts);
         return;
       }
+    }
+    
+    try {
+      const response = await fetch(`${BASE_URL}/bodyparts`);
       
       if (!response.ok) {
-        console.error('❌ Body parts API response not ok:', response.status, response.statusText);
-        setBodyParts(fallbackBodyParts);
+        setBodyParts([]);
         return;
       }
       
       const data = await response.json();
-      console.log('✅ Successfully fetched body parts:', data);
       
-      const bodyPartNames = Array.isArray(data) ? data.map(bp => bp.name) : fallbackBodyParts;
+      const bodyPartNames = Array.isArray(data) ? data.map(bp => bp.name) : [];
+      
+      // Cache in localStorage
+      localStorage.setItem('bodyparts', JSON.stringify(bodyPartNames));
+      localStorage.setItem('bodyparts_timestamp', Date.now().toString());
+      
       setBodyParts(bodyPartNames);
     } catch (error) {
-      console.error('🔥 Network/Fetch error for body parts:', error.name, error.message);
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        console.error('🌐 This appears to be a network connectivity issue');
-      }
-      setBodyParts(fallbackBodyParts);
+      setBodyParts([]);
     }
   };
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Clear cache for testing
-      localStorage.removeItem('exercises');
-      localStorage.removeItem('exercises_timestamp');
-      console.log('🧹 Cleared cache for fresh fetch');
-      
       const exercises = await fetchAllExercises();
       await fetchBodyParts();
-      console.log('🎯 Setting allExercises with', exercises.length, 'exercises');
-      console.log('📋 First 3 exercises:', exercises.slice(0, 3));
+
       setAllExercises(exercises);
       setLoading(false);
     };
@@ -166,7 +115,7 @@ const Workouts = () => {
 
   // Filter exercises based on search and body part
   useEffect(() => {
-    console.log('🔍 Filtering with allExercises.length:', allExercises.length);
+
     let filtered = allExercises;
     if (selectedBodyPart !== 'all') {
       filtered = filtered.filter(exercise => exercise.bodyPart?.toLowerCase() === selectedBodyPart.toLowerCase());
@@ -176,7 +125,7 @@ const Workouts = () => {
         exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    console.log('📋 Filtered exercises count:', filtered.length);
+
     setFilteredExercises(filtered);
     setCurrentPage(1); // Reset to first page when filters change
   }, [allExercises, selectedBodyPart, searchTerm]);

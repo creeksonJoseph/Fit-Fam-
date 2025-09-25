@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 
@@ -9,6 +9,11 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showRequirements, setShowRequirements] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Wake up the server
+    fetch('https://fit-fam-server.onrender.com/exercises').catch(() => {});
+  }, []);
 
   const requirements = {
     length: password.length >= 8,

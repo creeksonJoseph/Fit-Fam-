@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
@@ -7,35 +7,60 @@ const WorkoutSession = () => {
   const { id } = useParams();
   const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
+  const [time, setTime] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const intervalRef = useRef(null);
 
   const BASE_URL = 'https://fit-fam-server.onrender.com';
 
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return { hours: hours.toString().padStart(2, '0'), minutes: minutes.toString().padStart(2, '0'), seconds: secs.toString().padStart(2, '0') };
+  };
+
+  const handleStartStop = () => {
+    if (isRunning) {
+      clearInterval(intervalRef.current);
+      setIsRunning(false);
+    } else {
+      setHasStarted(true);
+      setIsRunning(true);
+      intervalRef.current = setInterval(() => {
+        setTime(prev => prev + 1);
+      }, 1000);
+    }
+  };
+
+  const handleSave = () => {
+    alert('Workout saved! (Backend implementation pending)');
+  };
+
   useEffect(() => {
-    const fetchExercise = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/exercises/${id}`);
-        const data = await response.json();
-        const mappedExercise = {
-          id: data.exerciseId,
-          name: data.name,
-          bodyPart: data.bodyParts?.[0] || 'unknown',
-          equipment: data.equipments?.[0] || 'unknown',
-          target: data.targetMuscles?.[0] || 'unknown',
-          gifUrl: data.gifUrl,
-          instructions: data.instructions || [],
-          secondaryMuscles: data.secondaryMuscles || []
-        };
-        setExercise(mappedExercise);
-      } catch (error) {
-        console.error('Error fetching exercise:', error);
-      } finally {
-        setLoading(false);
+    const fetchExercise = () => {
+      // Only use cached exercises since individual exercise API doesn't exist
+      const cachedExercises = localStorage.getItem('exercises');
+      if (cachedExercises) {
+        const exercises = JSON.parse(cachedExercises);
+        const cachedExercise = exercises.find(ex => ex.id === id);
+        if (cachedExercise) {
+          setExercise(cachedExercise);
+        }
       }
+      setLoading(false);
     };
 
     if (id) {
       fetchExercise();
     }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [id]);
 
   if (loading) {
@@ -77,8 +102,8 @@ const WorkoutSession = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="workouts" />
-        <main className="flex-1 flex items-center justify-center p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
-          <div className="mx-auto w-full max-w-2xl text-center">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+          <div className="mx-auto w-full max-w-2xl">
             <Link 
               to={`/workout-detail/${id}`} 
               className="inline-flex items-center gap-1 sm:gap-2 mb-6 sm:mb-8 text-sm sm:text-base text-background-dark dark:text-background-light hover:text-primary transition-colors"
@@ -90,37 +115,57 @@ const WorkoutSession = () => {
               <span className="sm:hidden">Back</span>
             </Link>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-background-dark dark:text-background-light capitalize">
-              {exercise.name}
-            </h1>
-            <p className="mt-3 sm:mt-4 text-sm sm:text-lg text-background-dark/60 dark:text-background-light/60">
-              Focus on your breath and flow through each pose with intention. Remember to listen to your body and modify as needed.
-            </p>
+            <div className="text-center">
+              <div className="relative w-full max-w-sm mx-auto rounded-lg sm:rounded-xl overflow-hidden shadow-lg mb-6 sm:mb-8 bg-background-dark/5 dark:bg-background-light/5">
+                <img 
+                  alt={exercise.name} 
+                  className="w-full h-auto object-contain" 
+                  src={exercise.gifUrl}
+                />
+              </div>
 
-            <div className="mt-8 sm:mt-12">
-              <div className="grid grid-cols-3 gap-3 sm:gap-6">
-                <div className="flex flex-col items-center justify-center rounded-lg bg-white dark:bg-background-dark/50 p-4 sm:p-6 border border-background-dark/10 dark:border-background-light/10">
-                  <span className="text-4xl sm:text-6xl lg:text-7xl font-black text-primary">00</span>
-                  <span className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-background-dark/60 dark:text-background-light/60">Hours</span>
-                </div>
-                <div className="flex flex-col items-center justify-center rounded-lg bg-white dark:bg-background-dark/50 p-4 sm:p-6 border border-background-dark/10 dark:border-background-light/10">
-                  <span className="text-4xl sm:text-6xl lg:text-7xl font-black text-primary">30</span>
-                  <span className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-background-dark/60 dark:text-background-light/60">Minutes</span>
-                </div>
-                <div className="flex flex-col items-center justify-center rounded-lg bg-white dark:bg-background-dark/50 p-4 sm:p-6 border border-background-dark/10 dark:border-background-light/10">
-                  <span className="text-4xl sm:text-6xl lg:text-7xl font-black text-primary">00</span>
-                  <span className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-background-dark/60 dark:text-background-light/60">Seconds</span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-background-dark dark:text-background-light capitalize mb-4">
+                {exercise.name}
+              </h1>
+
+              <div className="mt-8 sm:mt-12">
+                <div className="grid grid-cols-3 gap-3 sm:gap-6">
+                  <div className="flex flex-col items-center justify-center rounded-lg bg-white dark:bg-background-dark/50 p-4 sm:p-6 border border-background-dark/10 dark:border-background-light/10">
+                    <span className="text-4xl sm:text-6xl lg:text-7xl font-black text-primary">{formatTime(time).hours}</span>
+                    <span className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-background-dark/60 dark:text-background-light/60">Hours</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center rounded-lg bg-white dark:bg-background-dark/50 p-4 sm:p-6 border border-background-dark/10 dark:border-background-light/10">
+                    <span className="text-4xl sm:text-6xl lg:text-7xl font-black text-primary">{formatTime(time).minutes}</span>
+                    <span className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-background-dark/60 dark:text-background-light/60">Minutes</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center rounded-lg bg-white dark:bg-background-dark/50 p-4 sm:p-6 border border-background-dark/10 dark:border-background-light/10">
+                    <span className="text-4xl sm:text-6xl lg:text-7xl font-black text-primary">{formatTime(time).seconds}</span>
+                    <span className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-background-dark/60 dark:text-background-light/60">Seconds</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-8 sm:mt-12 flex flex-col items-center justify-center gap-3 sm:gap-4 sm:flex-row">
-              <button className="flex w-full items-center justify-center rounded-full bg-primary px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-black transition-transform hover:scale-105 sm:w-auto">
-                Stop
-              </button>
-              <button className="flex w-full items-center justify-center rounded-full bg-background-dark/10 dark:bg-background-light/10 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-background-dark dark:text-background-light transition-transform hover:scale-105 sm:w-auto">
-                Save
-              </button>
+              <div className="mt-8 sm:mt-12 flex flex-col items-center justify-center gap-3 sm:gap-4 sm:flex-row">
+                <button 
+                  onClick={handleStartStop}
+                  className={`flex w-full items-center justify-center rounded-full px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold transition-all hover:scale-105 sm:w-auto ${
+                    isRunning ? 'bg-red-500 text-white' : 'bg-primary text-black'
+                  }`}
+                >
+                  {isRunning ? 'Stop' : 'Start'}
+                </button>
+                <button 
+                  onClick={handleSave}
+                  disabled={!hasStarted}
+                  className={`flex w-full items-center justify-center rounded-full px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold transition-all hover:scale-105 sm:w-auto ${
+                    hasStarted 
+                      ? 'bg-green-500 text-white cursor-pointer' 
+                      : 'bg-background-dark/10 dark:bg-background-light/10 text-background-dark/50 dark:text-background-light/50 cursor-not-allowed'
+                  }`}
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         </main>

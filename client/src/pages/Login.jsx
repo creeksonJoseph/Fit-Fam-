@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    // Wake up the server
+    fetch('https://fit-fam-server.onrender.com/exercises').catch(() => {});
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();

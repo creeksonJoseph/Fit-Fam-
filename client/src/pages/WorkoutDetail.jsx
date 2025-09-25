@@ -11,26 +11,22 @@ const WorkoutDetail = () => {
   const BASE_URL = 'https://fit-fam-server.onrender.com';
 
   useEffect(() => {
-    const fetchExercise = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/exercises/${id}`);
-        const data = await response.json();
-        const mappedExercise = {
-          id: data.exerciseId,
-          name: data.name,
-          bodyPart: data.bodyParts?.[0] || 'unknown',
-          equipment: data.equipments?.[0] || 'unknown',
-          target: data.targetMuscles?.[0] || 'unknown',
-          gifUrl: data.gifUrl,
-          instructions: data.instructions || [],
-          secondaryMuscles: data.secondaryMuscles || []
-        };
-        setExercise(mappedExercise);
-      } catch (error) {
-        console.error('Error fetching exercise:', error);
-      } finally {
-        setLoading(false);
+    const fetchExercise = () => {
+      // Only use cached exercises since individual exercise API doesn't exist
+      const cachedExercises = localStorage.getItem('exercises');
+      if (cachedExercises) {
+        const exercises = JSON.parse(cachedExercises);
+        const cachedExercise = exercises.find(ex => ex.id === id);
+        if (cachedExercise) {
+          console.log('📦 Using cached exercise data for ID:', id);
+          setExercise(cachedExercise);
+        } else {
+          console.log('❌ Exercise not found in cache for ID:', id);
+        }
+      } else {
+        console.log('❌ No cached exercises found');
       }
+      setLoading(false);
     };
 
     if (id) {
@@ -90,10 +86,10 @@ const WorkoutDetail = () => {
               <span className="sm:hidden">Back</span>
             </Link>
 
-            <div className="relative w-full aspect-video rounded-lg sm:rounded-xl overflow-hidden shadow-lg mb-6 sm:mb-8">
+            <div className="relative w-full max-w-md mx-auto rounded-lg sm:rounded-xl overflow-hidden shadow-lg mb-6 sm:mb-8 bg-background-dark/5 dark:bg-background-light/5">
               <img 
                 alt={exercise.name} 
-                className="w-full h-full object-cover" 
+                className="w-full h-auto object-contain" 
                 src={exercise.gifUrl}
               />
             </div>
