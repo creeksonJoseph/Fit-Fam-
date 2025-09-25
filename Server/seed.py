@@ -27,7 +27,7 @@ with app.app_context():
     db.drop_all()
     db.create_all()
 
-    # --- Create Users ---
+    #Create Users
     users = []
     for username in USERNAMES:
         email = f"{username}@example.com"
@@ -38,7 +38,7 @@ with app.app_context():
     db.session.commit()
     print(f"✅ Created {len(users)} users.")
 
-    # --- Create Workouts ---
+    #Create Workouts
     workouts = []
     for w in WORKOUTS:
         workout = Workout(**w)
@@ -48,11 +48,11 @@ with app.app_context():
     db.session.commit()
     print(f"✅ Created {len(workouts)} workouts.")
 
-    # --- Create Random User Progress ---
+    #Create Random User Progress
     progress_entries = []
     for user in users:
         for workout in workouts:
-            if random.random() < 0.4:  # 40% chance to have progress
+            if random.random() < 0.4: #40% chance to have progress
                 progress = UserProgress(
                     user_id=user.id,
                     workout_id=workout.id,
@@ -65,7 +65,7 @@ with app.app_context():
     db.session.commit()
     print(f"✅ Created {len(progress_entries)} user progress entries.")
 
-    # --- Create Random Friendships ---
+    #Create Random Friendships
     friend_links = set()
     friends = []
 
