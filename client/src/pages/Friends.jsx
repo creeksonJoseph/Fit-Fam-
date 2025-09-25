@@ -9,7 +9,7 @@ const Friends = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="friends" />
-        <main className="flex-1 p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="flex justify-between items-center mb-10">
             <h1 className="text-4xl font-black text-gray-900 dark:text-white">Friends</h1>
             <Link to="/add-friends" className="bg-primary text-black font-bold py-2 px-6 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-all">

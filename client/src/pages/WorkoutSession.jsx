@@ -102,7 +102,7 @@ const WorkoutSession = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="workouts" />
-        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="mx-auto w-full max-w-2xl">
             <Link 
               to={`/workout-detail/${id}`} 

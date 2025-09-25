@@ -13,7 +13,7 @@ const Settings = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="settings" />
-        <main className="flex-1 p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold text-background-dark dark:text-white mb-8">
               Profile

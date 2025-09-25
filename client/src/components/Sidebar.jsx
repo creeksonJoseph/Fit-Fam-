@@ -6,7 +6,7 @@ const Sidebar = ({ activeTab = "" }) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex sticky top-0 h-[100vh] w-80 bg-background-light dark:bg-background-dark p-6 flex-col justify-between border-r border-primary/20 dark:border-primary/30 overflow-y-auto">
+      <aside className="hidden lg:flex fixed top-16 left-0 h-[calc(100vh-4rem)] w-80 bg-background-light dark:bg-background-dark p-6 flex-col justify-between border-r border-primary/20 dark:border-primary/30 overflow-y-auto z-40">
       <div className="flex flex-col gap-8">
         <nav className="flex flex-col gap-2">
           <Link
@@ -54,22 +54,6 @@ const Sidebar = ({ activeTab = "" }) => {
             </svg>
             <span>Workouts</span>
           </Link>
-          <Link
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium ${activeTab === "progress" ? "bg-primary/20 dark:bg-primary/30 text-gray-900 dark:text-white font-semibold" : "hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400"}`}
-            to="/my-progress"
-          >
-            <svg
-              fill="currentColor"
-              height="24"
-              viewBox="0 0 256 256"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176ZM104,120v24a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm32-16v40a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm32-16v56a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"></path>
-            </svg>
-            <span>Progress</span>
-          </Link>
-
         </nav>
       </div>
       <Link
@@ -102,10 +86,7 @@ const Sidebar = ({ activeTab = "" }) => {
             <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M248,120h-8V88a16,16,0,0,0-16-16H208V64a16,16,0,0,0-16-16H168a16,16,0,0,0-16,16v56H104V64A16,16,0,0,0,88,48H64A16,16,0,0,0,48,64v8H32A16,16,0,0,0,16,88v32H8a8,8,0,0,0,0,16h8v32a16,16,0,0,0,16,16H48v8a16,16,0,0,0,16,16H88a16,16,0,0,0,16-16V136h48v56a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16v-8h16a16,16,0,0,0,16-16V136h8a8,8,0,0,0,0-16ZM32,168V88H48v80Zm56,24H64V64H88V192Zm104,0H168V64h24V175.82c0,.06,0,.12,0,.18s0,.12,0,.18V192Zm32-24H208V88h16Z"></path></svg>
             <span className="text-xs mt-1">Workouts</span>
           </Link>
-          <Link className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${activeTab === 'progress' ? 'text-primary' : 'text-gray-600 dark:text-gray-400 hover:text-primary'}`} to="/my-progress">
-            <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176ZM104,120v24a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm32-16v40a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm32-16v56a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"></path></svg>
-            <span className="text-xs mt-1">Progress</span>
-          </Link>
+
         </div>
       </nav>
     </>

@@ -9,7 +9,7 @@ const FriendsActivity = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="dashboard" />
-        <main className="flex-1 p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="max-w-4xl mx-auto">
             <Link to="/dashboard" className="inline-flex items-center gap-2 mb-6 text-background-dark dark:text-background-light hover:text-primary transition-colors">
               <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg">

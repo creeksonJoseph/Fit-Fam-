@@ -9,7 +9,7 @@ const AddFriends = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="friends" />
-        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="mx-auto max-w-7xl">
             <Link 
               to="/friends" 

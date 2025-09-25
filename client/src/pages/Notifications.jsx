@@ -136,7 +136,7 @@ const Notifications = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="w-full max-w-4xl mx-auto space-y-6 lg:space-y-10">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-background-dark dark:text-background-light">Friend Requests</h1>
             

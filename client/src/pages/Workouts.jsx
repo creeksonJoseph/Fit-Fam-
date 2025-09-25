@@ -185,7 +185,7 @@ const Workouts = () => {
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="workouts" />
-        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="mx-auto max-w-5xl">
             <div className="mb-8 sm:mb-16 text-center">
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-background-dark dark:text-background-light">Explore Exercises</h1>
