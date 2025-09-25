@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
@@ -11,12 +12,12 @@ const Friends = () => {
         <main className="flex-1 p-8 pb-24 lg:pb-8">
           <div className="flex justify-between items-center mb-10">
             <h1 className="text-4xl font-black text-gray-900 dark:text-white">Friends</h1>
-            <button className="bg-primary text-black font-bold py-2 px-6 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-all">
+            <Link to="/add-friends" className="bg-primary text-black font-bold py-2 px-6 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-all">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
               </svg>
               <span>Add Friend</span>
-            </button>
+            </Link>
           </div>
 
           <div className="mb-12">
