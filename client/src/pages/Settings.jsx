@@ -16,7 +16,7 @@ const Settings = () => {
         <main className="flex-1 p-8 pb-24 lg:pb-8">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold text-background-dark dark:text-white mb-8">
-              Settings
+              Profile
             </h2>
             <div className="space-y-8">
               <div className="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
@@ -42,12 +42,17 @@ const Settings = () => {
                     </button>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-background-dark dark:text-white">{username}</h3>
+                    <h3 className="text-2xl font-bold text-background-dark dark:text-white">
+                      {username}
+                    </h3>
                   </div>
                 </div>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-background-dark/70 dark:text-white/70" htmlFor="username">
+                    <label
+                      className="block text-sm font-medium text-background-dark/70 dark:text-white/70"
+                      htmlFor="username"
+                    >
                       Change Username
                     </label>
                     <div className="flex items-center gap-4">
@@ -62,11 +67,17 @@ const Settings = () => {
                           onChange={(e) => setUsername(e.target.value)}
                         />
                       </div>
-                      <button 
+                      <button
                         className="p-3 rounded-lg bg-background-light dark:bg-background-dark/60 text-background-dark dark:text-white hover:bg-primary/20 dark:hover:bg-primary/30"
                         onClick={() => setIsEditingUsername(!isEditingUsername)}
                       >
-                        <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="currentColor"
+                          height="20"
+                          viewBox="0 0 256 256"
+                          width="20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>
@@ -76,7 +87,10 @@ const Settings = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-background-dark/70 dark:text-white/70" htmlFor="email">
+                    <label
+                      className="block text-sm font-medium text-background-dark/70 dark:text-white/70"
+                      htmlFor="email"
+                    >
                       Change Email
                     </label>
                     <div className="flex items-center gap-4">
@@ -91,11 +105,17 @@ const Settings = () => {
                           onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
-                      <button 
+                      <button
                         className="p-3 rounded-lg bg-background-light dark:bg-background-dark/60 text-background-dark dark:text-white hover:bg-primary/20 dark:hover:bg-primary/30"
                         onClick={() => setIsEditingEmail(!isEditingEmail)}
                       >
-                        <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="currentColor"
+                          height="20"
+                          viewBox="0 0 256 256"
+                          width="20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>

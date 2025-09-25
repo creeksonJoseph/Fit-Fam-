@@ -1,8 +1,110 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
 const MyProgress = () => {
+  const [progressData, setProgressData] = useState({
+    totalWorkouts: 0,
+    avgDuration: 0,
+    weeklyProgress: [],
+    leaderboard: []
+  });
+  const [loading, setLoading] = useState(true);
+  
+  const BASE_URL = 'https://group-fitness-app-db.onrender.com';
+  const userId = 1; // TODO: Get from auth context
+
+  useEffect(() => {
+    const fetchProgressData = async () => {
+      try {
+        // Fetch user progress
+        const progressRes = await fetch(`${BASE_URL}/progress/${userId}`);
+        const userProgress = await progressRes.json();
+        
+        // Calculate total workouts
+        const totalWorkouts = userProgress.length;
+        
+        // Calculate average duration (from workout data)
+        let avgDuration = 0;
+        if (totalWorkouts > 0) {
+          const workoutIds = [...new Set(userProgress.map(p => p.workout_id))];
+          const workoutPromises = workoutIds.map(id => 
+            fetch(`${BASE_URL}/workouts/${id}`).then(res => res.json())
+          );
+          const workouts = await Promise.all(workoutPromises);
+          const totalDuration = workouts.reduce((sum, w) => sum + (w.duration || 0), 0);
+          avgDuration = Math.round(totalDuration / workouts.length);
+        }
+        
+        // Calculate weekly progress (last 4 weeks)
+        const now = new Date();
+        const weeklyProgress = [];
+        for (let i = 3; i >= 0; i--) {
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - (i * 7) - now.getDay());
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 6);
+          
+          const weekWorkouts = userProgress.filter(p => {
+            const completedDate = new Date(p.time_completed);
+            return completedDate >= weekStart && completedDate <= weekEnd;
+          }).length;
+          
+          weeklyProgress.push(weekWorkouts);
+        }
+        
+        // Fetch all users for leaderboard
+        const usersRes = await fetch(`${BASE_URL}/users`);
+        const users = await usersRes.json();
+        
+        // Calculate leaderboard
+        const leaderboardPromises = users.map(async (user) => {
+          const userProgressRes = await fetch(`${BASE_URL}/progress/${user.id}`);
+          const userProgressData = await userProgressRes.json();
+          return {
+            id: user.id,
+            username: user.username,
+            workoutCount: Array.isArray(userProgressData) ? userProgressData.length : 0
+          };
+        });
+        
+        const leaderboardData = await Promise.all(leaderboardPromises);
+        const sortedLeaderboard = leaderboardData
+          .sort((a, b) => b.workoutCount - a.workoutCount)
+          .slice(0, 5);
+        
+        setProgressData({
+          totalWorkouts,
+          avgDuration,
+          weeklyProgress,
+          leaderboard: sortedLeaderboard
+        });
+      } catch (error) {
+        console.error('Error fetching progress data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProgressData();
+  }, []);
+  
+  if (loading) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark font-display text-[#111827] dark:text-white">
+        <AppHeader />
+        <div className="flex min-h-screen">
+          <Sidebar activeTab="progress" />
+          <main className="flex-1 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+  
+  const maxWeeklyWorkouts = Math.max(...progressData.weeklyProgress, 1);
+  
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-[#111827] dark:text-white">
       <AppHeader />
@@ -18,30 +120,30 @@ const MyProgress = () => {
                 <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6 flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-lg text-background-dark dark:text-white">Total Workouts</h3>
-                    <span className="text-primary text-3xl font-bold">5</span>
+                    <span className="text-primary text-3xl font-bold">{progressData.totalWorkouts}</span>
                   </div>
                   <div className="h-2 bg-background-light dark:bg-background-dark rounded-full">
-                    <div className="h-2 bg-primary rounded-full" style={{width: '71%'}}></div>
+                    <div className="h-2 bg-primary rounded-full" style={{width: `${Math.min((progressData.totalWorkouts / 10) * 100, 100)}%`}}></div>
                   </div>
                   <p className="text-sm text-background-dark/60 dark:text-white/60">This week's progress</p>
                 </div>
                 <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6 flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-lg text-background-dark dark:text-white">Avg. Duration</h3>
-                    <span className="text-primary text-3xl font-bold">45<span className="text-lg">min</span></span>
+                    <span className="text-primary text-3xl font-bold">{progressData.avgDuration}<span className="text-lg">min</span></span>
                   </div>
                   <div className="h-2 bg-background-light dark:bg-background-dark rounded-full">
-                    <div className="h-2 bg-primary rounded-full" style={{width: '75%'}}></div>
+                    <div className="h-2 bg-primary rounded-full" style={{width: `${Math.min((progressData.avgDuration / 60) * 100, 100)}%`}}></div>
                   </div>
                   <p className="text-sm text-background-dark/60 dark:text-white/60">Compared to last week</p>
                 </div>
                 <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6 flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-lg text-background-dark dark:text-white">Calories Burned</h3>
-                    <span className="text-primary text-3xl font-bold">2500</span>
+                    <span className="text-primary text-3xl font-bold">{progressData.totalWorkouts * 300}</span>
                   </div>
                   <div className="h-2 bg-background-light dark:bg-background-dark rounded-full">
-                    <div className="h-2 bg-primary rounded-full" style={{width: '90%'}}></div>
+                    <div className="h-2 bg-primary rounded-full" style={{width: `${Math.min(((progressData.totalWorkouts * 300) / 2500) * 100, 100)}%`}}></div>
                   </div>
                   <p className="text-sm text-background-dark/60 dark:text-white/60">Weekly goal met</p>
                 </div>
@@ -50,62 +152,57 @@ const MyProgress = () => {
                 <div className="lg:col-span-2 bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6">
                   <h2 className="text-2xl font-bold mb-6 text-background-dark dark:text-white">Workout History</h2>
                   <div className="grid grid-flow-col grid-rows-[1fr_auto] items-end justify-items-center gap-6 h-48 px-3">
-                    <div className="w-full bg-background-light dark:bg-background-dark rounded-t-lg relative">
-                      <div className="absolute bottom-0 w-full bg-primary/20 dark:bg-primary/30 rounded-t" style={{height: '50%'}}></div>
-                    </div>
-                    <p className="text-xs font-bold text-background-dark/60 dark:text-white/60">Week 1</p>
-                    <div className="w-full bg-background-light dark:bg-background-dark rounded-t-lg relative">
-                      <div className="absolute bottom-0 w-full bg-primary/20 dark:bg-primary/30 rounded-t" style={{height: '70%'}}></div>
-                    </div>
-                    <p className="text-xs font-bold text-background-dark/60 dark:text-white/60">Week 2</p>
-                    <div className="w-full bg-background-light dark:bg-background-dark rounded-t-lg relative">
-                      <div className="absolute bottom-0 w-full bg-primary/20 dark:bg-primary/30 rounded-t" style={{height: '60%'}}></div>
-                    </div>
-                    <p className="text-xs font-bold text-background-dark/60 dark:text-white/60">Week 3</p>
-                    <div className="w-full bg-background-light dark:bg-background-dark rounded-t-lg relative">
-                      <div className="absolute bottom-0 w-full bg-primary rounded-t" style={{height: '100%'}}></div>
-                    </div>
-                    <p className="text-xs font-bold text-primary">Week 4</p>
+                    {progressData.weeklyProgress.map((workouts, index) => (
+                      <React.Fragment key={index}>
+                        <div className="w-full bg-background-light dark:bg-background-dark rounded-t-lg relative">
+                          <div 
+                            className={`absolute bottom-0 w-full rounded-t ${
+                              index === 3 ? 'bg-primary' : 'bg-primary/20 dark:bg-primary/30'
+                            }`} 
+                            style={{height: `${(workouts / maxWeeklyWorkouts) * 100}%`}}
+                          ></div>
+                        </div>
+                        <p className={`text-xs font-bold ${
+                          index === 3 ? 'text-primary' : 'text-background-dark/60 dark:text-white/60'
+                        }`}>
+                          Week {index + 1}
+                        </p>
+                      </React.Fragment>
+                    ))}
                   </div>
                 </div>
                 <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6">
                   <h2 className="text-2xl font-bold mb-4 text-background-dark dark:text-white">Leaderboard</h2>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-background-dark/60 dark:text-white/60">1</span>
-                        <p className="font-medium text-background-dark dark:text-white">Sophia Carter</p>
-                      </div>
-                      <p className="font-bold text-background-dark dark:text-white">15</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-background-dark/60 dark:text-white/60">2</span>
-                        <p className="font-medium text-background-dark dark:text-white">Liam Bennett</p>
-                      </div>
-                      <p className="font-bold text-background-dark dark:text-white">12</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-background-dark/60 dark:text-white/60">3</span>
-                        <p className="font-medium text-background-dark dark:text-white">Ava Harper</p>
-                      </div>
-                      <p className="font-bold text-background-dark dark:text-white">10</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-background-dark/60 dark:text-white/60">4</span>
-                        <p className="font-medium text-background-dark dark:text-white">Noah Foster</p>
-                      </div>
-                      <p className="font-bold text-background-dark dark:text-white">8</p>
-                    </div>
-                    <div className="flex items-center justify-between bg-primary/20 dark:bg-primary/30 rounded-lg p-3 -m-3">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-primary">5</span>
-                        <p className="font-bold text-primary">You</p>
-                      </div>
-                      <p className="font-bold text-primary">5</p>
-                    </div>
+                    {progressData.leaderboard.map((user, index) => {
+                      const isCurrentUser = user.id === userId;
+                      return (
+                        <div 
+                          key={user.id}
+                          className={`flex items-center justify-between ${
+                            isCurrentUser ? 'bg-primary/20 dark:bg-primary/30 rounded-lg p-3 -m-3' : ''
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className={`font-bold ${
+                              isCurrentUser ? 'text-primary' : 'text-background-dark/60 dark:text-white/60'
+                            }`}>
+                              {index + 1}
+                            </span>
+                            <p className={`font-medium ${
+                              isCurrentUser ? 'font-bold text-primary' : 'text-background-dark dark:text-white'
+                            }`}>
+                              {isCurrentUser ? 'You' : user.username}
+                            </p>
+                          </div>
+                          <p className={`font-bold ${
+                            isCurrentUser ? 'text-primary' : 'text-background-dark dark:text-white'
+                          }`}>
+                            {user.workoutCount}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
