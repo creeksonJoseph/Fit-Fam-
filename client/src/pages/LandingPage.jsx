@@ -40,8 +40,7 @@ const LandingPage = () => {
               <div
                 className="relative w-full aspect-video bg-cover bg-center rounded-xl"
                 style={{
-                  backgroundImage:
-                    'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAVHhqaMXNfinX7KJ6Z2g6qHbOMRazdz6wLsewmerg_Zchn2e9siQlXF-6DDijnJntbzA8ETXlcKKNoshcHiDVDZll_kMVllx7dhkTmAlO5VyaYxZpPKONkAtbgRXt0NG0UCXGBJUSFuNliV6tRiHvKUGWGIor2gsohmJet4iBGOqMShkqCHSn9yvgOX_US_ju1B8KRusDU272kxqd7bGwfY3NlshZzuEUneIpVQoqwNYev_e8A9FIGWaCagvC9hUaxG2v1YUV-MxA")',
+                  backgroundImage: 'url("/candra-winata.jpg")',
                 }}
               ></div>
             </div>
@@ -92,8 +91,7 @@ const LandingPage = () => {
                 <div
                   className="w-full aspect-video bg-cover bg-center rounded-lg"
                   style={{
-                    backgroundImage:
-                      'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDx6Xj6SECR4cpZn3sDeLRVVmXvfnq9fqqrSWhIY7VwYpOZ7eGL0GlfARPyI1ETehI6Fk7oUztoqu8P4vBic3a6C0MWPyTepks0IGu5MqBY-qtnG-LLA2-DFRSP0DaeKtRuIxNM4QlQEEAbq3Lg3PkJuL5etB4a7FmnwLjI1I2J_15rXJpZgw19ad_AI1Dj4TJTpBZ8zNGQJfpOMeadS_4t9MSvjyKlhU3xtDrdS1M42JiTfe-xXueEbcF9qJLtAihEXa6hkj6pWhs")',
+                    backgroundImage: 'url("/ben-weber-.jpg")',
                   }}
                 ></div>
                 <h3 className="text-lg md:text-xl font-bold">

@@ -187,19 +187,21 @@ const Workouts = () => {
         <Sidebar activeTab="workouts" />
         <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8 lg:ml-80">
           <div className="mx-auto max-w-5xl">
-            <div className="mb-8 sm:mb-16 text-center">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-background-dark dark:text-background-light">Explore Exercises</h1>
+            <div className="mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-background-dark">Explore Exercises</h1>
+                  <p className="mt-1 sm:mt-2 text-sm sm:text-base text-background-dark/60">
+                    Find the perfect workout for your fitness goals
+                  </p>
+                </div>
                 <Link 
                   to="/workout-history" 
-                  className="bg-primary text-black px-4 py-2 rounded-lg font-bold hover:bg-primary/90 transition-colors"
+                  className="bg-primary text-black px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors self-start"
                 >
                   View History
                 </Link>
               </div>
-              <p className="mt-3 sm:mt-6 text-sm sm:text-lg text-background-dark/60 dark:text-background-light/60">
-                Find the perfect workout for your fitness goals. Browse our extensive library of exercises, categorized by body part and equipment.
-              </p>
             </div>
             
             <div className="relative mb-6 sm:mb-10">
@@ -258,7 +260,7 @@ const Workouts = () => {
                     />
                   </div>
                   <div className="p-3 sm:p-5 flex-grow flex flex-col">
-                    <h3 className="font-bold text-lg sm:text-xl text-background-dark dark:text-background-light capitalize">{exercise.name}</h3>
+                    <h3 className="font-semibold text-base sm:text-lg text-background-dark capitalize">{exercise.name}</h3>
                     <p className="text-xs sm:text-sm text-background-dark/50 dark:text-background-light/50 capitalize">{exercise.bodyPart}</p>
                     <div className="flex items-center justify-between gap-2 mt-2 sm:mt-3">
                       <span className="inline-flex items-center text-xs sm:text-sm font-medium text-background-dark/60 dark:text-background-light/60 min-w-0 flex-1">

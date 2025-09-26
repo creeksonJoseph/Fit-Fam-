@@ -87,7 +87,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="bg-background-light dark:bg-background-dark font-display text-[#111827] dark:text-white">
+      <div className="bg-background-light font-display text-text-light">
         <AppHeader />
         <div className="flex min-h-screen">
           <Sidebar activeTab="dashboard" />
@@ -102,31 +102,31 @@ const Dashboard = () => {
   const maxWeeklyWorkouts = Math.max(...progressData.weeklyProgress, 1);
 
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display text-[#111827] dark:text-white">
+    <div className="bg-background-light font-display text-text-light">
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="dashboard" />
-        <main className="flex-1 p-8 pb-24 lg:pb-8 lg:ml-80">
+        <main className="flex-1 p-6 pb-24 lg:pb-8 lg:ml-80">
           <div className="mx-auto max-w-5xl">
-            <div className="mb-12">
-              <h1 className="text-5xl font-bold text-background-dark dark:text-white">
+            <div className="mb-8">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-background-dark">
                 Dashboard
               </h1>
-              <p className="mt-2 text-lg text-background-dark/60 dark:text-white/60">
+              <p className="mt-2 text-sm sm:text-base text-background-dark/60">
                 Track your fitness journey and celebrate your achievements.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6 flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-lg text-background-dark dark:text-white">
+                  <h3 className="font-semibold text-base text-background-dark">
                     Total Workouts
                   </h3>
-                  <span className="text-primary text-3xl font-bold">
+                  <span className="text-primary text-2xl font-bold">
                     {progressData.totalWorkouts}
                   </span>
                 </div>
-                <div className="h-2 bg-background-light dark:bg-background-dark rounded-full">
+                <div className="h-2 bg-gray-200 rounded-full">
                   <div
                     className="h-2 bg-primary rounded-full"
                     style={{
@@ -134,21 +134,21 @@ const Dashboard = () => {
                     }}
                   ></div>
                 </div>
-                <p className="text-sm text-background-dark/60 dark:text-white/60">
+                <p className="text-sm text-background-dark/60">
                   Number of workouts you've grind
                 </p>
               </div>
-              <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6 flex flex-col gap-4">
+              <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-lg text-background-dark dark:text-white">
+                  <h3 className="font-semibold text-base text-background-dark">
                     Avg. Duration
                   </h3>
-                  <span className="text-primary text-3xl font-bold">
+                  <span className="text-primary text-2xl font-bold">
                     {progressData.avgDuration}
-                    <span className="text-lg">min</span>
+                    <span className="text-base">min</span>
                   </span>
                 </div>
-                <div className="h-2 bg-background-light dark:bg-background-dark rounded-full">
+                <div className="h-2 bg-gray-200 rounded-full">
                   <div
                     className="h-2 bg-primary rounded-full"
                     style={{
@@ -156,20 +156,20 @@ const Dashboard = () => {
                     }}
                   ></div>
                 </div>
-                <p className="text-sm text-background-dark/60 dark:text-white/60">
+                <p className="text-sm text-background-dark/60">
                   Compared to last week
                 </p>
               </div>
-              <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6 flex flex-col gap-4">
+              <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-lg text-background-dark dark:text-white">
+                  <h3 className="font-semibold text-base text-background-dark">
                     Calories Burned
                   </h3>
-                  <span className="text-primary text-3xl font-bold">
+                  <span className="text-primary text-2xl font-bold">
                     {progressData.totalWorkouts * 300}
                   </span>
                 </div>
-                <div className="h-2 bg-background-light dark:bg-background-dark rounded-full">
+                <div className="h-2 bg-gray-200 rounded-full">
                   <div
                     className="h-2 bg-primary rounded-full"
                     style={{
@@ -177,25 +177,25 @@ const Dashboard = () => {
                     }}
                   ></div>
                 </div>
-                <p className="text-sm text-background-dark/60 dark:text-white/60">
+                <p className="text-sm text-background-dark/60">
                   Weekly goal met
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-              <div className="lg:col-span-2 bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6">
-                <h2 className="text-2xl font-bold mb-6 text-background-dark dark:text-white">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-4">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-background-dark">
                   Workout History
                 </h2>
-                <div className="grid grid-flow-col grid-rows-[1fr_auto] items-end justify-items-center gap-6 h-48 px-3">
+                <div className="grid grid-flow-col grid-rows-[1fr_auto] items-end justify-items-center gap-4 h-40 px-2">
                   {progressData.weeklyProgress.map((workouts, index) => (
                     <React.Fragment key={index}>
-                      <div className="w-full bg-background-light dark:bg-background-dark rounded-t-lg relative">
+                      <div className="w-full bg-gray-200 rounded-t-lg relative">
                         <div
                           className={`absolute bottom-0 w-full rounded-t ${
                             index === 3
                               ? "bg-primary"
-                              : "bg-primary/20 dark:bg-primary/30"
+                              : "bg-primary/20"
                           }`}
                           style={{
                             height: `${(workouts / maxWeeklyWorkouts) * 100}%`,
@@ -203,10 +203,10 @@ const Dashboard = () => {
                         ></div>
                       </div>
                       <p
-                        className={`text-xs font-bold ${
+                        className={`text-xs font-medium ${
                           index === 3
                             ? "text-primary"
-                            : "text-background-dark/60 dark:text-white/60"
+                            : "text-background-dark/60"
                         }`}
                       >
                         Week {index + 1}
@@ -215,11 +215,11 @@ const Dashboard = () => {
                   ))}
                 </div>
               </div>
-              <div className="bg-white dark:bg-background-dark/50 rounded-xl shadow-sm p-6">
-                <h2 className="text-2xl font-bold mb-4 text-background-dark dark:text-white">
+              <div className="bg-white rounded-xl shadow-sm p-4">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-background-dark">
                   Leaderboard
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {progressData.leaderboard.map((user, index) => {
                     const isCurrentUser = user.id === userId;
                     return (
@@ -227,35 +227,35 @@ const Dashboard = () => {
                         key={user.id}
                         className={`flex items-center justify-between ${
                           isCurrentUser
-                            ? "bg-primary/20 dark:bg-primary/30 rounded-lg p-3 -m-3"
+                            ? "bg-primary/20 rounded-lg p-2 -m-2"
                             : ""
                         }`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           <span
-                            className={`font-bold ${
+                            className={`font-medium text-sm ${
                               isCurrentUser
                                 ? "text-primary"
-                                : "text-background-dark/60 dark:text-white/60"
+                                : "text-background-dark/60"
                             }`}
                           >
                             {index + 1}
                           </span>
                           <p
-                            className={`font-medium ${
+                            className={`font-medium text-sm ${
                               isCurrentUser
-                                ? "font-bold text-primary"
-                                : "text-background-dark dark:text-white"
+                                ? "font-semibold text-primary"
+                                : "text-background-dark"
                             }`}
                           >
                             {isCurrentUser ? "You" : user.username}
                           </p>
                         </div>
                         <p
-                          className={`font-bold ${
+                          className={`font-semibold text-sm ${
                             isCurrentUser
                               ? "text-primary"
-                              : "text-background-dark dark:text-white"
+                              : "text-background-dark"
                           }`}
                         >
                           {user.workoutCount}

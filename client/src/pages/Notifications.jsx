@@ -119,7 +119,7 @@ const Notifications = () => {
   
   if (loading) {
     return (
-      <div className="bg-background-light dark:bg-background-dark font-display">
+      <div className="bg-background-light font-display">
         <AppHeader />
         <div className="flex min-h-screen">
           <Sidebar />
@@ -132,45 +132,45 @@ const Notifications = () => {
   }
   
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display">
+    <div className="bg-background-light font-display">
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 lg:ml-80">
-          <div className="w-full max-w-4xl mx-auto space-y-6 lg:space-y-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-background-dark dark:text-background-light">Friend Requests</h1>
+        <main className="flex-1 p-4 sm:p-6 pb-24 lg:pb-8 lg:ml-80">
+          <div className="w-full max-w-4xl mx-auto space-y-6">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-background-dark">Friend Requests</h1>
             
-            <div className="space-y-4 lg:space-y-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-background-dark dark:text-background-light">Incoming</h2>
+            <div className="space-y-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-background-dark">Incoming</h2>
               {friendRequests.incoming.length === 0 ? (
-                <div className="bg-background-light dark:bg-background-dark rounded-xl shadow-sm border border-primary/20 dark:border-primary/30 p-6 text-center">
-                  <p className="text-background-dark/60 dark:text-background-light/60">No incoming friend requests</p>
+                <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                  <p className="text-background-dark/60 text-sm">No incoming friend requests</p>
                 </div>
               ) : (
-                <div className="bg-background-light dark:bg-background-dark rounded-xl shadow-sm border border-primary/20 dark:border-primary/30 divide-y divide-primary/20 dark:divide-primary/30">
+                <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
                   {friendRequests.incoming.map((request) => (
-                    <div key={request.id} className="p-3 sm:p-4 lg:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                        <div className="rounded-full w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-bold text-lg">{request.username.charAt(0).toUpperCase()}</span>
+                    <div key={request.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="rounded-full w-10 h-10 flex-shrink-0 bg-primary/20 flex items-center justify-center">
+                          <span className="text-primary font-semibold text-sm">{request.username.charAt(0).toUpperCase()}</span>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm sm:text-base font-semibold text-background-dark dark:text-background-light truncate">{request.username}</p>
-                          <p className="text-xs sm:text-sm text-background-dark/60 dark:text-background-light/60">{request.mutualFriends} mutual friends</p>
+                          <p className="text-sm font-semibold text-background-dark truncate">{request.username}</p>
+                          <p className="text-xs text-background-dark/60">{request.mutualFriends} mutual friends</p>
                         </div>
                       </div>
-                      <div className="flex gap-2 shrink-0 w-full sm:w-auto">
+                      <div className="flex gap-2 w-full sm:w-auto">
                         <button 
                           onClick={() => handleAcceptRequest(request.id)}
-                          className="flex items-center justify-center rounded-lg h-9 sm:h-10 px-3 sm:px-5 bg-primary text-background-dark font-bold text-xs sm:text-sm hover:opacity-90 transition-opacity flex-1 sm:flex-none"
+                          className="flex items-center justify-center rounded-lg h-8 px-3 bg-primary text-background-dark font-medium text-xs hover:opacity-90 transition-opacity flex-1 sm:flex-none"
                         >
-                          <span>Accept</span>
+                          Accept
                         </button>
                         <button 
                           onClick={() => handleDeclineRequest(request.id)}
-                          className="flex items-center justify-center rounded-lg h-9 sm:h-10 px-3 sm:px-5 bg-primary/20 dark:bg-primary/30 text-background-dark dark:text-background-light font-medium text-xs sm:text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors flex-1 sm:flex-none"
+                          className="flex items-center justify-center rounded-lg h-8 px-3 bg-gray-200 text-background-dark font-medium text-xs hover:bg-gray-300 transition-colors flex-1 sm:flex-none"
                         >
-                          <span>Decline</span>
+                          Decline
                         </button>
                       </div>
                     </div>
@@ -179,29 +179,29 @@ const Notifications = () => {
               )}
             </div>
             
-            <div className="space-y-4 lg:space-y-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-background-dark dark:text-background-light">Outgoing</h2>
+            <div className="space-y-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-background-dark">Outgoing</h2>
               {friendRequests.outgoing.length === 0 ? (
-                <div className="bg-background-light dark:bg-background-dark rounded-xl shadow-sm border border-primary/20 dark:border-primary/30 p-6 text-center">
-                  <p className="text-background-dark/60 dark:text-background-light/60">No outgoing friend requests</p>
+                <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                  <p className="text-background-dark/60 text-sm">No outgoing friend requests</p>
                 </div>
               ) : (
-                <div className="bg-background-light dark:bg-background-dark rounded-xl shadow-sm border border-primary/20 dark:border-primary/30 divide-y divide-primary/20 dark:divide-primary/30">
+                <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
                   {friendRequests.outgoing.map((request) => (
-                    <div key={request.id} className="p-3 sm:p-4 lg:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                        <div className="rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-bold">{request.username.charAt(0).toUpperCase()}</span>
+                    <div key={request.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="rounded-full w-8 h-8 flex-shrink-0 bg-primary/20 flex items-center justify-center">
+                          <span className="text-primary font-semibold text-xs">{request.username.charAt(0).toUpperCase()}</span>
                         </div>
-                        <p className="text-sm sm:text-base text-background-dark/80 dark:text-background-light/80 min-w-0">
-                          You requested to follow <span className="font-semibold text-background-dark dark:text-background-light">{request.username}</span>
+                        <p className="text-sm text-background-dark/80 min-w-0">
+                          You requested to follow <span className="font-semibold text-background-dark">{request.username}</span>
                         </p>
                       </div>
                       <button 
                         onClick={() => handleCancelRequest(request.id)}
-                        className="flex items-center justify-center rounded-lg h-9 sm:h-10 px-3 sm:px-5 bg-primary/20 dark:bg-primary/30 text-background-dark dark:text-background-light font-medium text-xs sm:text-sm hover:bg-primary/30 dark:hover:bg-primary/40 transition-colors shrink-0"
+                        className="flex items-center justify-center rounded-lg h-8 px-3 bg-gray-200 text-background-dark font-medium text-xs hover:bg-gray-300 transition-colors shrink-0"
                       >
-                        <span>Cancel</span>
+                        Cancel
                       </button>
                     </div>
                   ))}
