@@ -77,8 +77,7 @@ const LandingPage = () => {
                 <div
                   className="w-full aspect-video bg-cover bg-center rounded-lg"
                   style={{
-                    backgroundImage:
-                      'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAmjhofhTkxKOzphsT8hAmra0-G_Awxv4o89-HU5T4-OmI1Wu5qtcxoeLh50_ypKHNI_k0t1cG6JNe_ZcxCtngtwov34nMXCOl0ZmekGXfxVOiaQ-Vc9UiJdJ7nnyG_IhiR5GlJH6wSF1G_EOuwOzCZXCJ6Xw5AgVDW2icRE6HFKbiWTjL__Hr8E6g2Fb3oXykm4Qxrv8QSHgInt1CM-rm19O7wCwAQvWvRsIJaVHq1NZxPQa4u-aBcEAwZt5fJ_YSBRveRzY8Ng4s")',
+                    backgroundImage: 'url("/april-laugh.jpg")',
                   }}
                 ></div>
                 <h3 className="text-lg md:text-xl font-bold">Add Friends</h3>
