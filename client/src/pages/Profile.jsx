@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
 
@@ -10,163 +11,87 @@ const Profile = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState("");
-  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-
-  const BASE_URL = "http://127.0.0.1:5000";
-  const userId = 1;
+  const [loading, setLoading] = useState(true);
+  
+  const BASE_URL = 'http://localhost:5000';
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/users`);
-        const users = await response.json();
-        const currentUser = users.find((user) => user.id === userId);
-
-        if (currentUser) {
-          setUsername(currentUser.username);
-          setEmail(currentUser.email);
-          setProfileImage(currentUser.profile_image || "");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
+    if (user) {
+      setUsername(user.username);
+      setEmail(user.email);
+      setProfileImage(user.profile_image || "");
+    }
+    setLoading(false);
+  }, [user]);
+  
   const handleSaveUsername = async () => {
+    if (!user?.id) return;
     try {
-      await fetch(`${BASE_URL}/users/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
+      await fetch(`${BASE_URL}/users/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username })
       });
       setIsEditingUsername(false);
     } catch (error) {
-      console.error("Error updating username:", error);
+      console.error('Error updating username:', error);
     }
   };
-
+  
   const handleSaveEmail = async () => {
+    if (!user?.id) return;
     try {
-      await fetch(`${BASE_URL}/users/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+      await fetch(`${BASE_URL}/users/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email })
       });
       setIsEditingEmail(false);
     } catch (error) {
-      console.error("Error updating email:", error);
+      console.error('Error updating email:', error);
     }
   };
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
-    console.log("File selected:", file);
+    if (!file) return;
 
-    if (!file) {
-      console.log("No file selected");
-      return;
-    }
-
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      console.log("Invalid file type:", file.type);
-      alert("Please select an image file");
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      console.log("File too large:", file.size, "bytes");
-      alert("File size must be less than 5MB");
-      return;
-    }
-
-    console.log("File validation passed, starting upload...");
     setUploading(true);
-
     try {
-      // Create FormData for Cloudinary upload
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "Fitfam");
-      formData.append("cloud_name", "dzgwtssxv");
+      formData.append('file', file);
+      formData.append('upload_preset', 'Fitfam');
+      formData.append('cloud_name', 'dzgwtssxv');
 
-      console.log("FormData created, uploading to Cloudinary...");
-      console.log(
-        "Upload URL:",
-        "https://api.cloudinary.com/v1_1/dzgwtssxv/image/upload"
-      );
-      console.log("Upload preset:", "Fitfam");
-      console.log("Cloud name:", "dzgwtssxv");
+      const response = await fetch('https://api.cloudinary.com/v1_1/dzgwtssxv/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Upload to Cloudinary
-      const cloudinaryResponse = await fetch(
-        "https://api.cloudinary.com/v1_1/dzgwtssxv/image/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const data = await response.json();
+      const imageUrl = data.secure_url;
 
-      console.log("Cloudinary response status:", cloudinaryResponse.status);
-      console.log("Cloudinary response ok:", cloudinaryResponse.ok);
-
-      if (!cloudinaryResponse.ok) {
-        const errorText = await cloudinaryResponse.text();
-        console.error("Cloudinary upload failed:", errorText);
-        throw new Error(
-          `Cloudinary upload failed: ${cloudinaryResponse.status} - ${errorText}`
-        );
-      }
-
-      const cloudinaryData = await cloudinaryResponse.json();
-      console.log("Cloudinary response data:", cloudinaryData);
-
-      const imageUrl = cloudinaryData.secure_url;
-      console.log("Image URL from Cloudinary:", imageUrl);
-
-      // Update user profile with new image URL
-      console.log("Updating user profile with new image URL...");
-      const updateResponse = await fetch(`${BASE_URL}/users/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const updateResponse = await fetch(`${BASE_URL}/users/${user?.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ profile_image: imageUrl }),
       });
 
-      console.log("Profile update response status:", updateResponse.status);
-      console.log("Profile update response ok:", updateResponse.ok);
-
       if (updateResponse.ok) {
-        const updatedUser = await updateResponse.json();
-        console.log("Profile updated successfully:", updatedUser);
         setProfileImage(imageUrl);
-        alert("Profile image updated successfully!");
-      } else {
-        const errorText = await updateResponse.text();
-        console.error("Profile update failed:", errorText);
-        throw new Error(
-          `Profile update failed: ${updateResponse.status} - ${errorText}`
-        );
       }
     } catch (error) {
-      console.error("Error uploading image:", error);
-      console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      });
-      alert(`Failed to upload image: ${error.message}`);
+      console.error('Error uploading image:', error);
     } finally {
       setUploading(false);
     }
   };
-
+  
   if (loading) {
     return (
       <div className="bg-background-light font-display">
@@ -214,15 +139,15 @@ const Profile = () => {
                       {uploading ? (
                         <div className="w-3 h-3 border-2 border-background-dark border-t-transparent rounded-full animate-spin"></div>
                       ) : (
-                        <svg
-                          fill="currentColor"
-                          height="12"
-                          viewBox="0 0 256 256"
-                          width="12"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
-                        </svg>
+                      <svg
+                        fill="currentColor"
+                        height="12"
+                        viewBox="0 0 256 256"
+                        width="12"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
+                      </svg>
                       )}
                     </label>
                   </div>
@@ -266,7 +191,7 @@ const Profile = () => {
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>
-                      <button
+                      <button 
                         onClick={handleSaveUsername}
                         className="px-3 py-2 rounded-lg bg-primary text-background-dark font-medium hover:bg-primary/80 text-sm"
                       >
@@ -307,7 +232,7 @@ const Profile = () => {
                           <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l22.63-22.62L214.63,86.05Z"></path>
                         </svg>
                       </button>
-                      <button
+                      <button 
                         onClick={handleSaveEmail}
                         className="px-3 py-2 rounded-lg bg-primary text-background-dark font-medium hover:bg-primary/80 text-sm"
                       >
@@ -318,8 +243,8 @@ const Profile = () => {
                 </div>
               </div>
               <div>
-                <button
-                  onClick={() => navigate("/login")}
+                <button 
+                  onClick={() => navigate('/login')}
                   className="lg:hidden px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors text-sm"
                 >
                   Log Out

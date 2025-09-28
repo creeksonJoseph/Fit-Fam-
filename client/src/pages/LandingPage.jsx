@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 
 const LandingPage = () => {
+  useEffect(() => {
+    // Wake up the server
+    fetch('https://fit-fam-server.onrender.com/exercises').catch(() => {});
+  }, []);
   return (
     <div className="relative w-full min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
       <AppHeader isAuthenticated={false} showAuthButtons={true} />

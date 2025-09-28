@@ -15,7 +15,7 @@ const Workouts = () => {
   const [hasMore, setHasMore] = useState(true);
   const ITEMS_PER_PAGE = 20;
 
-  const BASE_URL = 'https://fit-fam-server.onrender.com';
+  const BASE_URL = 'https://fit-fam-server-1.onrender.com';
 
 
 

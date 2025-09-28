@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models import db, Workout, UserProgress
 
-workout_bp = Blueprint('workout', __name__)
+workout_bp = Blueprint('workout_sessions', __name__)
 
 @workout_bp.route('/workout-sessions', methods=['POST'])
 def save_workout_session():

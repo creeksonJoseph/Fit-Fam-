@@ -1,70 +1,127 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
 
 const Dashboard = () => {
   const [progressData, setProgressData] = useState({
     totalWorkouts: 0,
-    totalDuration: 0,
-    totalFriends: 0,
-    weeklyProgress: [],
+    avgDuration: 0,
+    recentWorkouts: [],
     leaderboard: [],
   });
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = "http://127.0.0.1:5000";
-  const userId = 1; // TODO: Get from auth context
+  const BASE_URL = "http://localhost:5000";
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchProgressData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
       try {
+        const currentUserId = user.id;
         // Fetch user workout stats
-        const statsRes = await fetch(
-          `${BASE_URL}/workout-sessions/${userId}/stats`
-        );
-        const stats = await statsRes.json();
-
+        console.log('Dashboard: Fetching stats for user:', currentUserId);
+        const statsRes = await fetch(`${BASE_URL}/workout-sessions/${currentUserId}/stats`, {
+          credentials: 'include'
+        });
+        console.log('Dashboard: Stats response status:', statsRes.status);
+        const stats = statsRes.ok ? await statsRes.json() : {};
+        console.log('Dashboard: Raw stats from backend:', stats);
+        
         const totalWorkouts = stats.total_workouts || 0;
         const totalDuration = stats.total_duration || 0;
+        console.log('Dashboard: Parsed values - workouts:', totalWorkouts, 'duration:', totalDuration);
+        
+        // Format total duration as hours/minutes/seconds
+        const formatDuration = (seconds) => {
+          const hours = Math.floor(seconds / 3600);
+          const minutes = Math.floor((seconds % 3600) / 60);
+          const remainingSeconds = seconds % 60;
+          
+          if (hours > 0) {
+            return { value: hours, unit: 'hr' };
+          } else if (minutes > 0) {
+            return { value: minutes, unit: 'min' };
+          } else {
+            return { value: remainingSeconds, unit: 'sec' };
+          }
+        };
+        
+        const formattedDuration = formatDuration(totalDuration);
+        console.log('Dashboard: Formatted duration:', formattedDuration);
+        
+        // Fetch recent workout sessions
+        const workoutRes = await fetch(`${BASE_URL}/workout-sessions/${currentUserId}`, {
+          credentials: 'include'
+        });
+        const recentWorkouts = workoutRes.ok ? await workoutRes.json() : [];
+        
+        // Get exercise details for body parts
+        const exercisesRes = await fetch('https://fit-fam-server-1.onrender.com/exercises');
+        const exercises = exercisesRes.ok ? await exercisesRes.json() : [];
+        
+        const latestWorkouts = Array.isArray(recentWorkouts) ? recentWorkouts.slice(0, 3).map(workout => {
+          const exercise = exercises.find(ex => ex.name.toLowerCase() === workout.name.toLowerCase());
+          return {
+            ...workout,
+            bodyPart: exercise?.bodyParts?.[0] || 'Unknown'
+          };
+        }) : []
 
-        // Fetch user workout sessions (successfully saved workouts)
-        const sessionsRes = await fetch(
-          `${BASE_URL}/workout-sessions/${userId}`
-        );
-        const userSessions = await sessionsRes.json();
+        // Fetch friends data to count accepted friends
+        console.log('Dashboard: Fetching friends data...');
+        const friendsRes = await fetch(`${BASE_URL}/friends/${currentUserId}`, {
+          credentials: 'include'
+        });
+        const friendsData = friendsRes.ok ? await friendsRes.json() : [];
+        const totalFriends = Array.isArray(friendsData) ? friendsData.filter(f => f.status === 'accepted').length : 0;
+        console.log('Dashboard: Total accepted friends:', totalFriends);
+        
+        // Fetch all users for leaderboard
+        console.log('Dashboard: Fetching all users...');
+        const usersRes = await fetch(`${BASE_URL}/users/`, {
+          credentials: 'include'
+        });
+        console.log('Dashboard: Users response status:', usersRes.status);
+        const users = usersRes.ok ? await usersRes.json() : [];
+        console.log('Dashboard: Users data:', users);
 
-        // Calculate weekly progress (last 4 weeks) from successfully saved workouts
-        const now = new Date();
-        const weeklyProgress = [];
-        for (let i = 3; i >= 0; i--) {
-          const weekStart = new Date(now);
-          weekStart.setDate(now.getDate() - i * 7 - now.getDay());
-          const weekEnd = new Date(weekStart);
-          weekEnd.setDate(weekStart.getDate() + 6);
+        // Calculate leaderboard based on total workout time
+        console.log('Dashboard: Calculating leaderboard for', users.length, 'users');
+        const leaderboardPromises = Array.isArray(users) ? users.map(async (user) => {
+          console.log('Dashboard: Fetching stats for user:', user.username, 'ID:', user.id);
+          const userStatsRes = await fetch(
+            `${BASE_URL}/workout-sessions/${user.id}/stats`,
+            { credentials: 'include' }
+          );
+          const userStats = userStatsRes.ok ? await userStatsRes.json() : {};
+          console.log('Dashboard: User', user.username, 'stats:', userStats);
+          return {
+            id: user.id,
+            username: user.username,
+            totalTime: userStats.total_duration || 0,
+          };
+        }) : [];
 
-          const weekWorkouts = userSessions.filter((session) => {
-            const completedDate = new Date(session.time_completed);
-            return completedDate >= weekStart && completedDate <= weekEnd;
-          }).length;
-
-          weeklyProgress.push(weekWorkouts);
-        }
-
-        // Fetch total friends count
-        const friendsRes = await fetch(`${BASE_URL}/friends/${userId}/count`);
-        const friendsData = await friendsRes.json();
-        const totalFriends = friendsData.total_friends || 0;
-
-        // Fetch leaderboard by total duration
-        const leaderboardRes = await fetch(`${BASE_URL}/leaderboard`);
-        const leaderboardData = await leaderboardRes.json();
+        const leaderboardData = await Promise.all(leaderboardPromises);
+        console.log('Dashboard: Leaderboard data before sorting:', leaderboardData);
+        const sortedLeaderboard = leaderboardData
+          .sort((a, b) => b.totalTime - a.totalTime)
+          .slice(0, 5);
+        console.log('Dashboard: Final sorted leaderboard:', sortedLeaderboard);
 
         setProgressData({
           totalWorkouts,
-          totalDuration,
+          totalDuration: formattedDuration,
           totalFriends,
-          weeklyProgress,
-          leaderboard: leaderboardData,
+          recentWorkouts: latestWorkouts,
+          leaderboard: sortedLeaderboard,
         });
       } catch (error) {
         console.error("Error fetching progress data:", error);
@@ -90,7 +147,7 @@ const Dashboard = () => {
     );
   }
 
-  const maxWeeklyWorkouts = Math.max(...progressData.weeklyProgress, 1);
+
 
   return (
     <div className="bg-background-light font-display text-text-light">
@@ -132,23 +189,23 @@ const Dashboard = () => {
               <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-base text-background-dark">
-                    Total Duration
+                    Total Time
                   </h3>
                   <span className="text-primary text-2xl font-bold">
-                    {progressData.totalDuration}
-                    <span className="text-base">min</span>
+                    {progressData.totalDuration?.value || 0}
+                    <span className="text-base">{progressData.totalDuration?.unit || 'min'}</span>
                   </span>
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full">
                   <div
                     className="h-2 bg-primary rounded-full"
                     style={{
-                      width: `${Math.min((progressData.totalDuration / 1000) * 100, 100)}%`,
+                      width: `${Math.min(((progressData.totalDuration?.value || 0) / (progressData.totalDuration?.unit === 'hr' ? 10 : 120)) * 100, 100)}%`,
                     }}
                   ></div>
                 </div>
                 <p className="text-sm text-background-dark/60">
-                  Total time you've grinded
+                  Time spent exercising
                 </p>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-3">
@@ -157,51 +214,57 @@ const Dashboard = () => {
                     Total Friends
                   </h3>
                   <span className="text-primary text-2xl font-bold">
-                    {progressData.totalFriends}
+                    {progressData.totalFriends || 0}
                   </span>
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full">
                   <div
                     className="h-2 bg-primary rounded-full"
                     style={{
-                      width: `${Math.min((progressData.totalFriends / 10) * 100, 100)}%`,
+                      width: `${Math.min(((progressData.totalFriends || 0) / 10) * 100, 100)}%`,
                     }}
                   ></div>
                 </div>
                 <p className="text-sm text-background-dark/60">
-                  Fitness buddies connected
+                  Community connections
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-4">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4 text-background-dark">
-                  Workout History
+                  Recent Workouts
                 </h2>
-                <div className="grid grid-flow-col grid-rows-[1fr_auto] items-end justify-items-center gap-4 h-40 px-2">
-                  {progressData.weeklyProgress.map((workouts, index) => (
-                    <React.Fragment key={index}>
-                      <div className="w-full bg-gray-200 rounded-t-lg relative">
-                        <div
-                          className={`absolute bottom-0 w-full rounded-t ${
-                            index === 3 ? "bg-primary" : "bg-primary/20"
-                          }`}
-                          style={{
-                            height: `${(workouts / maxWeeklyWorkouts) * 100}%`,
-                          }}
-                        ></div>
+                <div className="space-y-2">
+                  {progressData.recentWorkouts.length === 0 ? (
+                    <p className="text-background-dark/60 text-center py-8">No workouts yet</p>
+                  ) : (
+                    progressData.recentWorkouts.map((workout, index) => (
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between items-start mb-1">
+                          <p className="font-medium text-background-dark capitalize text-sm">{workout.name}</p>
+                          <span className="text-primary font-semibold text-sm">
+                            {(() => {
+                              const seconds = workout.duration;
+                              const hours = Math.floor(seconds / 3600);
+                              const minutes = Math.floor((seconds % 3600) / 60);
+                              const remainingSeconds = seconds % 60;
+                              
+                              if (hours > 0) return `${hours}h`;
+                              if (minutes > 0) return `${minutes}m`;
+                              return `${remainingSeconds}s`;
+                            })()} 
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-background-dark/60 capitalize">{workout.bodyPart}</span>
+                          <span className="text-xs text-background-dark/60">
+                            {new Date(workout.time_completed).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
-                      <p
-                        className={`text-xs font-medium ${
-                          index === 3
-                            ? "text-primary"
-                            : "text-background-dark/60"
-                        }`}
-                      >
-                        Week {index + 1}
-                      </p>
-                    </React.Fragment>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-4">
@@ -209,11 +272,11 @@ const Dashboard = () => {
                   Leaderboard
                 </h2>
                 <div className="space-y-3">
-                  {progressData.leaderboard.map((user, index) => {
-                    const isCurrentUser = user.id === userId;
+                  {progressData.leaderboard.map((leaderboardUser, index) => {
+                    const isCurrentUser = leaderboardUser.id === user?.id;
                     return (
                       <div
-                        key={user.id}
+                        key={leaderboardUser.id}
                         className={`flex items-center justify-between ${
                           isCurrentUser
                             ? "bg-primary/20 rounded-lg p-2 -m-2"
@@ -237,7 +300,7 @@ const Dashboard = () => {
                                 : "text-background-dark"
                             }`}
                           >
-                            {isCurrentUser ? "You" : user.username}
+                            {isCurrentUser ? "You" : leaderboardUser.username}
                           </p>
                         </div>
                         <p
@@ -247,7 +310,16 @@ const Dashboard = () => {
                               : "text-background-dark"
                           }`}
                         >
-                          {user.total_duration}min
+                          {(() => {
+                            const seconds = leaderboardUser.totalTime;
+                            const hours = Math.floor(seconds / 3600);
+                            const minutes = Math.floor((seconds % 3600) / 60);
+                            const remainingSeconds = seconds % 60;
+                            
+                            if (hours > 0) return `${hours}h`;
+                            if (minutes > 0) return `${minutes}m`;
+                            return `${remainingSeconds}s`;
+                          })()} 
                         </p>
                       </div>
                     );

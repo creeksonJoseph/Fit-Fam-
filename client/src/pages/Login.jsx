@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useAuth } from "../contexts/AuthContext";
 import AppHeader from "../components/AppHeader";
 import Toast from "../components/Toast";
 
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email address").required("Email is required"),
+  password: Yup.string().required("Password is required")
+});
+
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -13,14 +22,31 @@ const Login = () => {
     fetch('https://fit-fam-server.onrender.com/exercises').catch(() => {});
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      // Simulate login API call
-      setToast({ message: "Login successful!", type: "success" });
-      setTimeout(() => navigate("/dashboard"), 1000);
+      const response = await fetch('http://localhost:5000/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(values)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        login(data.user);
+        setToast({ message: "Login successful!", type: "success" });
+        
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+      } else {
+        const error = await response.json();
+        setToast({ message: error.error || "Login failed!", type: "error" });
+      }
     } catch (error) {
       setToast({ message: "Login failed!", type: "error" });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -57,95 +83,103 @@ const Login = () => {
                     Ready to continue your fitness journey?
                   </p>
                 </div>
-                <form className="mt-4 lg:mt-8 space-y-4 lg:space-y-6" onSubmit={handleSubmit}>
-                  <div>
-                    <label htmlFor="email-address" className="sr-only">
-                      Email address
-                    </label>
-                    <input
-                      id="email-address"
-                      name="email"
-                      type="email"
-                      placeholder="Email address"
-                      autoComplete="email"
-                      required
-                      className="appearance-none rounded-lg relative block w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-primary/20 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-sm sm:text-base"
-                    />
-                  </div>
-                  <div className="relative">
-                    <label htmlFor="password" className="sr-only">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Password"
-                      autoComplete="current-password"
-                      required
-                      className="appearance-none rounded-lg relative block w-full px-3 py-2 sm:px-4 sm:py-3 pr-10 sm:pr-12 border-2 border-primary/20 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-sm sm:text-base"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <svg
-                          className="h-5 w-5 text-background-dark/50 dark:text-background-light/50"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                <Formik
+                  initialValues={{ email: "", password: "" }}
+                  validationSchema={validationSchema}
+                  onSubmit={handleSubmit}
+                >
+                  {({ isSubmitting, errors, touched }) => (
+                    <Form className="mt-4 lg:mt-8 space-y-4 lg:space-y-6">
+                      <div>
+                        <label htmlFor="email" className="sr-only">
+                          Email address
+                        </label>
+                        <Field
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="Email address"
+                          autoComplete="email"
+                          className={`appearance-none rounded-lg relative block w-full px-3 py-2 sm:px-4 sm:py-3 border-2 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-sm sm:text-base ${
+                            errors.email && touched.email
+                              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                              : "border-primary/20 focus:ring-primary focus:border-primary"
+                          }`}
+                        />
+                        <ErrorMessage name="email" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                      <div className="relative">
+                        <label htmlFor="password" className="sr-only">
+                          Password
+                        </label>
+                        <Field
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Password"
+                          autoComplete="current-password"
+                          className={`appearance-none rounded-lg relative block w-full px-3 py-2 sm:px-4 sm:py-3 pr-10 sm:pr-12 border-2 bg-background-light dark:bg-background-dark placeholder-background-dark/50 dark:placeholder-background-light/50 text-background-dark dark:text-background-light focus:outline-none focus:z-10 text-sm sm:text-base ${
+                            errors.password && touched.password
+                              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                              : "border-primary/20 focus:ring-primary focus:border-primary"
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          onClick={() => setShowPassword(!showPassword)}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                          />
-                        </svg>
-                      ) : (
-                        <svg
-                          className="h-5 w-5 text-background-dark/50 dark:text-background-light/50"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                          {showPassword ? (
+                            <svg
+                              className="h-5 w-5 text-background-dark/50 dark:text-background-light/50"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                              />
+                            </svg>
+                          ) : (
+                            <svg
+                              className="h-5 w-5 text-background-dark/50 dark:text-background-light/50"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                        <ErrorMessage name="password" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+
+                      <div>
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-bold rounded-lg text-background-dark bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-colors duration-300 disabled:opacity-50"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <Link
-                        to="/forgot-password"
-                        className="font-medium text-primary hover:text-primary/90"
-                      >
-                        Forgot your password?
-                      </Link>
-                    </div>
-                  </div>
-                  <div>
-                    <button
-                      type="submit"
-                      className="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-bold rounded-lg text-background-dark bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-colors duration-300"
-                    >
-                      Log In
-                    </button>
-                  </div>
-                </form>
+                          {isSubmitting ? "Logging in..." : "Log In"}
+                        </button>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
                 <div className="mt-4 lg:mt-6 text-center">
                   <p className="text-xs sm:text-sm text-background-dark/70 dark:text-background-light/70">
                     Don't have an account?{" "}
