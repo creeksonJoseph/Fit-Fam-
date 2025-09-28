@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
@@ -7,116 +8,166 @@ const Notifications = () => {
   const [loading, setLoading] = useState(true);
   
   const BASE_URL = 'http://localhost:5000';
-  const [userId, setUserId] = useState(null);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchFriendRequests = async () => {
-      try {
-        // Get current user from session
-        const sessionRes = await fetch(`${BASE_URL}/users/session`, {
-          credentials: 'include'
-        });
-        
-        if (!sessionRes.ok) {
-          setLoading(false);
-          return;
-        }
-        
-        const sessionData = await sessionRes.json();
-        if (!sessionData.authenticated) {
-          setLoading(false);
-          return;
-        }
-        
-        const currentUserId = sessionData.user.id;
-        setUserId(currentUserId);
-        // Fetch all users to get user details
-        const usersRes = await fetch(`${BASE_URL}/users/`, { credentials: 'include' });
-        const users = await usersRes.json();
-        const usersMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
-        
-        // Fetch all friend relationships
-        const friendsRes = await fetch(`${BASE_URL}/friends/${currentUserId}`, { credentials: 'include' });
-        const friendsData = await friendsRes.json();
-        
-        // Get incoming requests (where current user is followed)
-        const allFriendsRes = await fetch(`${BASE_URL}/users/`, { credentials: 'include' });
-        const allUsers = await allFriendsRes.json();
-        
-        const incomingRequests = [];
-        const outgoingRequests = [];
-        
-        // Check all users for friend relationships
-        for (const user of allUsers) {
-          if (user.id === currentUserId) continue;
+  const fetchFriendRequests = async () => {
+    if (!user) {
+      console.log('Notifications: No user found, skipping fetch');
+      setLoading(false);
+      return;
+    }
+    
+    console.log('Notifications: Fetching friend requests for user:', user.id, user.username);
+    setLoading(true);
+    try {
+      console.log('Notifications: Making API calls...');
+      const [usersRes, friendsRes] = await Promise.all([
+        fetch(`${BASE_URL}/users/`, { credentials: 'include' }),
+        fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' })
+      ]);
+      
+      console.log('Notifications: Users response status:', usersRes.status);
+      console.log('Notifications: Friends response status:', friendsRes.status);
+      
+      const users = usersRes.ok ? await usersRes.json() : [];
+      const friendsData = friendsRes.ok ? await friendsRes.json() : [];
+      
+      console.log('Notifications: Users data:', users);
+      console.log('Notifications: Friends data:', friendsData);
+      
+      const usersMap = users.reduce((acc, u) => ({ ...acc, [u.id]: u }), {});
+      console.log('Notifications: Users map:', usersMap);
+      
+      const incomingRequests = [];
+      const outgoingRequests = [];
+      
+      if (Array.isArray(friendsData)) {
+        console.log('Notifications: Processing', friendsData.length, 'friend relationships');
+        friendsData.forEach((friend, index) => {
+          console.log(`Notifications: Processing friend ${index + 1}:`, friend);
           
-          const userFriendsRes = await fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' });
-          const userFriends = await userFriendsRes.json();
-          
-          // Check if this user sent a request to current user
-          const sentToMe = Array.isArray(userFriends) ? userFriends.find(
-            f => f.followed_user_id === currentUserId && f.status === 'pending'
-          ) : null;
-          
-          if (sentToMe) {
-            incomingRequests.push({
-              id: user.id,
-              username: user.username,
-              email: user.email,
-              mutualFriends: Math.floor(Math.random() * 5) // Mock mutual friends
-            });
-          }
-        }
-        
-        // Get outgoing requests (current user following others with pending status)
-        if (Array.isArray(friendsData)) {
-          friendsData.forEach(friend => {
-            if (friend.status === 'pending') {
+          if (friend.status === 'pending') {
+            // Incoming: where current user is followed_user_id
+            if (friend.followed_user_id === user.id) {
+              console.log('Notifications: Found incoming request from user:', friend.following_user_id);
+              const requesterUser = usersMap[friend.following_user_id];
+              if (requesterUser) {
+                console.log('Notifications: Adding incoming request:', requesterUser.username);
+                incomingRequests.push({
+                  id: requesterUser.id,
+                  username: requesterUser.username,
+                  email: requesterUser.email,
+                  mutualFriends: Math.floor(Math.random() * 5)
+                });
+              } else {
+                console.log('Notifications: Requester user not found in users map:', friend.following_user_id);
+              }
+            }
+            // Outgoing: where current user is following_user_id
+            else if (friend.following_user_id === user.id) {
+              console.log('Notifications: Found outgoing request to user:', friend.followed_user_id);
               const followedUser = usersMap[friend.followed_user_id];
               if (followedUser) {
+                console.log('Notifications: Adding outgoing request:', followedUser.username);
                 outgoingRequests.push({
                   id: followedUser.id,
                   username: followedUser.username,
                   email: followedUser.email,
-                  friendshipId: `${friend.following_user_id}-${friend.followed_user_id}`
+                  status: 'pending'
+                });
+              } else {
+                console.log('Notifications: Followed user not found in users map:', friend.followed_user_id);
+              }
+            }
+          } else if (friend.status === 'accepted') {
+            console.log('Notifications: Found accepted friendship:', friend);
+            // Show accepted requests in outgoing section
+            if (friend.following_user_id === user.id) {
+              const followedUser = usersMap[friend.followed_user_id];
+              if (followedUser) {
+                console.log('Notifications: Adding accepted outgoing:', followedUser.username);
+                outgoingRequests.push({
+                  id: followedUser.id,
+                  username: followedUser.username,
+                  email: followedUser.email,
+                  status: 'accepted',
+                  type: 'outgoing'
                 });
               }
             }
-          });
-        }
-        
-        setFriendRequests({ incoming: incomingRequests, outgoing: outgoingRequests });
-      } catch (error) {
-        console.error('Error fetching friend requests:', error);
-      } finally {
-        setLoading(false);
+            // Show accepted incoming requests
+            else if (friend.followed_user_id === user.id) {
+              const requesterUser = usersMap[friend.following_user_id];
+              if (requesterUser) {
+                console.log('Notifications: Adding accepted incoming:', requesterUser.username);
+                outgoingRequests.push({
+                  id: requesterUser.id,
+                  username: requesterUser.username,
+                  email: requesterUser.email,
+                  status: 'accepted',
+                  type: 'incoming'
+                });
+              }
+            }
+          }
+        });
+      } else {
+        console.log('Notifications: Friends data is not an array:', typeof friendsData);
+      }
+      
+      console.log('Notifications: Final incoming requests:', incomingRequests);
+      console.log('Notifications: Final outgoing requests:', outgoingRequests);
+      
+      setFriendRequests({ incoming: incomingRequests, outgoing: outgoingRequests });
+    } catch (error) {
+      console.error('Notifications: Error fetching friend requests:', error);
+      setFriendRequests({ incoming: [], outgoing: [] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFriendRequests();
+  }, [user]);
+
+  // Refetch when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user) {
+        fetchFriendRequests();
       }
     };
-    
-    fetchFriendRequests();
-  }, []);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user]);
   
   const handleAcceptRequest = async (fromUserId) => {
+    console.log('Notifications: Accepting request from user:', fromUserId);
     try {
-      // Update friend status to accepted
-      await fetch(`${BASE_URL}/friends/request`, {
+      const requestBody = {
+        following_user_id: fromUserId,
+        followed_user_id: user.id,
+        status: 'accepted'
+      };
+      console.log('Notifications: Accept request body:', requestBody);
+      
+      const response = await fetch(`${BASE_URL}/friends/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({
-          following_user_id: userId,
-          followed_user_id: fromUserId,
-          status: 'accepted'
-        })
+        body: JSON.stringify(requestBody)
       });
       
-      // Remove from incoming requests
-      setFriendRequests(prev => ({
-        ...prev,
-        incoming: prev.incoming.filter(req => req.id !== fromUserId)
-      }));
+      console.log('Notifications: Accept response status:', response.status);
+      const responseData = await response.json();
+      console.log('Notifications: Accept response data:', responseData);
+      
+      // Refetch to get updated data
+      fetchFriendRequests();
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+      console.error('Notifications: Error accepting friend request:', error);
     }
   };
   
@@ -128,12 +179,31 @@ const Notifications = () => {
     }));
   };
   
-  const handleCancelRequest = (toUserId) => {
-    // Remove from outgoing requests
-    setFriendRequests(prev => ({
-      ...prev,
-      outgoing: prev.outgoing.filter(req => req.id !== toUserId)
-    }));
+  const handleCancelRequest = async (toUserId) => {
+    console.log('Notifications: Cancelling request to user:', toUserId);
+    try {
+      const requestBody = {
+        following_user_id: user.id,
+        followed_user_id: toUserId
+      };
+      console.log('Notifications: Cancel request body:', requestBody);
+      
+      const response = await fetch(`${BASE_URL}/friends/request`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(requestBody)
+      });
+      
+      console.log('Notifications: Cancel response status:', response.status);
+      const responseData = await response.json();
+      console.log('Notifications: Cancel response data:', responseData);
+      
+      // Refetch to get updated data
+      fetchFriendRequests();
+    } catch (error) {
+      console.error('Notifications: Error cancelling friend request:', error);
+    }
   };
   
   if (loading) {
@@ -168,7 +238,7 @@ const Notifications = () => {
               ) : (
                 <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
                   {friendRequests.incoming.map((request) => (
-                    <div key={request.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div key={`incoming-${request.id}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="rounded-full w-10 h-10 flex-shrink-0 bg-primary/20 flex items-center justify-center">
                           <span className="text-primary font-semibold text-sm">{request.username.charAt(0).toUpperCase()}</span>
@@ -206,22 +276,32 @@ const Notifications = () => {
                 </div>
               ) : (
                 <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
-                  {friendRequests.outgoing.map((request) => (
-                    <div key={request.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  {friendRequests.outgoing.map((request, index) => (
+                    <div key={`outgoing-${request.id}-${index}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="rounded-full w-8 h-8 flex-shrink-0 bg-primary/20 flex items-center justify-center">
                           <span className="text-primary font-semibold text-xs">{request.username.charAt(0).toUpperCase()}</span>
                         </div>
                         <p className="text-sm text-background-dark/80 min-w-0">
-                          You requested to follow <span className="font-semibold text-background-dark">{request.username}</span>
+                          {request.type === 'incoming' ? (
+                            <><span className="font-semibold text-background-dark">{request.username}</span> requested to follow you</>
+                          ) : (
+                            <>You requested to follow <span className="font-semibold text-background-dark">{request.username}</span></>
+                          )}
                         </p>
                       </div>
-                      <button 
-                        onClick={() => handleCancelRequest(request.id)}
-                        className="flex items-center justify-center rounded-lg h-8 px-3 bg-gray-200 text-background-dark font-medium text-xs hover:bg-gray-300 transition-colors shrink-0"
-                      >
-                        Cancel
-                      </button>
+                      {request.status === 'accepted' ? (
+                        <span className="flex items-center justify-center rounded-lg h-8 px-3 bg-green-100 text-green-800 font-medium text-xs">
+                          Accepted
+                        </span>
+                      ) : (
+                        <button 
+                          onClick={() => handleCancelRequest(request.id)}
+                          className="flex items-center justify-center rounded-lg h-8 px-3 bg-red-100 text-red-800 font-medium text-xs hover:bg-red-200 transition-colors shrink-0"
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>

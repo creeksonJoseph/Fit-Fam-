@@ -47,21 +47,25 @@ const Friends = () => {
         
         if (Array.isArray(friendsData)) {
           friendsData.forEach(friend => {
-            const friendUser = usersMap[friend.followed_user_id];
-            if (friendUser) {
-              if (friend.status === 'accepted') {
+            // For accepted friends, show the other user
+            if (friend.status === 'accepted') {
+              const friendUser = usersMap[friend.followed_user_id];
+              if (friendUser) {
                 acceptedFriends.push({
                   id: friendUser.id,
                   username: friendUser.username,
-                  email: friendUser.email,
-                  isOnline: Math.random() > 0.5,
-                  lastActive: Math.random() > 0.7 ? 'Active now' : `${Math.floor(Math.random() * 5) + 1}d ago`
+                  email: friendUser.email
                 });
-              } else if (friend.status === 'pending') {
+              }
+            }
+            // For pending requests, show incoming requests (where current user is followed_user_id)
+            else if (friend.status === 'pending' && friend.followed_user_id === currentUserId) {
+              const requesterUser = usersMap[friend.following_user_id];
+              if (requesterUser) {
                 pending.push({
-                  id: friendUser.id,
-                  username: friendUser.username,
-                  email: friendUser.email,
+                  id: requesterUser.id,
+                  username: requesterUser.username,
+                  email: requesterUser.email,
                   mutualFriends: Math.floor(Math.random() * 5)
                 });
               }
@@ -96,11 +100,7 @@ const Friends = () => {
       
       const acceptedUser = pendingRequests.find(req => req.id === fromUserId);
       if (acceptedUser) {
-        setFriends(prev => [...prev, {
-          ...acceptedUser,
-          isOnline: Math.random() > 0.5,
-          lastActive: 'Active now'
-        }]);
+        setFriends(prev => [...prev, acceptedUser]);
         setPendingRequests(prev => prev.filter(req => req.id !== fromUserId));
       }
     } catch (error) {
@@ -174,19 +174,11 @@ const Friends = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredFriends.map((friend) => (
                     <div key={friend.id} className="flex items-center gap-3 p-3 bg-white rounded-lg">
-                      <div className="relative">
-                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-semibold text-base">{friend.username.charAt(0).toUpperCase()}</span>
-                        </div>
-                        {friend.isOnline && (
-                          <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary rounded-full border-2 border-white"></div>
-                        )}
+                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                        <span className="text-primary font-semibold text-base">{friend.username.charAt(0).toUpperCase()}</span>
                       </div>
                       <div>
                         <p className="font-semibold text-base">{friend.username}</p>
-                        <p className="text-sm text-background-dark/60">
-                          {friend.lastActive}
-                        </p>
                       </div>
                     </div>
                   ))}

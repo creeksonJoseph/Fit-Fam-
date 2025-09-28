@@ -74,7 +74,16 @@ const Dashboard = () => {
           };
         }) : []
 
-        // Fetch all users for leaderboard and friends count
+        // Fetch friends data to count accepted friends
+        console.log('Dashboard: Fetching friends data...');
+        const friendsRes = await fetch(`${BASE_URL}/friends/${currentUserId}`, {
+          credentials: 'include'
+        });
+        const friendsData = friendsRes.ok ? await friendsRes.json() : [];
+        const totalFriends = Array.isArray(friendsData) ? friendsData.filter(f => f.status === 'accepted').length : 0;
+        console.log('Dashboard: Total accepted friends:', totalFriends);
+        
+        // Fetch all users for leaderboard
         console.log('Dashboard: Fetching all users...');
         const usersRes = await fetch(`${BASE_URL}/users/`, {
           credentials: 'include'
@@ -82,8 +91,6 @@ const Dashboard = () => {
         console.log('Dashboard: Users response status:', usersRes.status);
         const users = usersRes.ok ? await usersRes.json() : [];
         console.log('Dashboard: Users data:', users);
-        const totalFriends = Array.isArray(users) ? users.length - 1 : 0; // Exclude current user
-        console.log('Dashboard: Total friends calculated:', totalFriends);
 
         // Calculate leaderboard based on total workout time
         console.log('Dashboard: Calculating leaderboard for', users.length, 'users');

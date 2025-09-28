@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
 
@@ -10,36 +11,23 @@ const AddFriends = () => {
   const [sentRequests, setSentRequests] = useState(new Set());
 
   const BASE_URL = "http://localhost:5000";
-  const [userId, setUserId] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchUsers = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
       try {
-        // Get current user from session
-        const sessionRes = await fetch(`${BASE_URL}/users/session`, {
-          credentials: 'include'
-        });
-        
-        if (!sessionRes.ok) {
-          setLoading(false);
-          return;
-        }
-        
-        const sessionData = await sessionRes.json();
-        if (!sessionData.authenticated) {
-          setLoading(false);
-          return;
-        }
-        
-        const currentUserId = sessionData.user.id;
-        setUserId(currentUserId);
         const [usersRes, friendsRes] = await Promise.all([
           fetch(`${BASE_URL}/users/`, { credentials: 'include' }),
-          fetch(`${BASE_URL}/friends/${currentUserId}`, { credentials: 'include' }),
+          fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' }),
         ]);
 
-        const allUsers = await usersRes.json();
-        const friendsData = await friendsRes.json();
+        const allUsers = usersRes.ok ? await usersRes.json() : [];
+        const friendsData = friendsRes.ok ? await friendsRes.json() : [];
 
         const friendIds = new Set();
         const pendingIds = new Set();
@@ -54,41 +42,51 @@ const AddFriends = () => {
           });
         }
 
-        const availableUsers = allUsers.filter(
-          (user) =>
-            user.id !== userId &&
-            !friendIds.has(user.id) &&
-            !pendingIds.has(user.id)
-        );
+        // Filter out current user, existing friends, and pending requests
+        const availableUsers = Array.isArray(allUsers) ? allUsers.filter(
+          (u) =>
+            u.id !== user.id &&
+            !friendIds.has(u.id) &&
+            !pendingIds.has(u.id)
+        ) : [];
 
         setUsers(availableUsers);
         setSentRequests(pendingIds);
       } catch (error) {
         console.error("Error fetching users:", error);
+        setUsers([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [user]);
 
   const handleAddFriend = async (targetUserId) => {
+    console.log('AddFriends: Sending friend request to user:', targetUserId);
     try {
-      await fetch(`${BASE_URL}/friends/request`, {
+      const requestBody = {
+        following_user_id: user.id,
+        followed_user_id: targetUserId,
+        status: "pending",
+      };
+      console.log('AddFriends: Request body:', requestBody);
+      
+      const response = await fetch(`${BASE_URL}/friends/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
-        body: JSON.stringify({
-          following_user_id: userId,
-          followed_user_id: targetUserId,
-          status: "pending",
-        }),
+        body: JSON.stringify(requestBody),
       });
+      
+      console.log('AddFriends: Response status:', response.status);
+      const responseData = await response.json();
+      console.log('AddFriends: Response data:', responseData);
 
       setSentRequests((prev) => new Set([...prev, targetUserId]));
     } catch (error) {
-      console.error("Error sending friend request:", error);
+      console.error("AddFriends: Error sending friend request:", error);
     }
   };
 
