@@ -3,8 +3,8 @@ from models import db, Workout, UserProgress
 from flask_restful import Api, Resource
 
 # Unique blueprint name + URL prefix
-workout_bp = Blueprint("workout_sessions", __name__, url_prefix="/workout-sessions")
-api = Api(workout_bp)   # <-- don't call this "app", call it api
+workout_session_bp = Blueprint("workout_sessions", __name__, url_prefix="/workout-sessions")
+api = Api(workout_session_bp)   # <-- don't call this "app", call it api
 
 
 class WorkoutSession(Resource):
