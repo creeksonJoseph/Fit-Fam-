@@ -10,7 +10,7 @@ from routes.User_routes import user_bp
 from routes.Workout_routes import workout_bp
 from routes.Progress_routes import progress_bp
 from routes.Friends_routes import friends_bp
-from Server.routes.Workout_session_routes import workout_bp as workout_session_bp
+from routes.Workout_session_routes import workout_bp as workout_session_bp
 
 
 def create_app():
