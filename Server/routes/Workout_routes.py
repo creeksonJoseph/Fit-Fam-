@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_restful import Api, Resource
 from models import db, Workout
 
-workout_bp = Blueprint("workout", __name__)
+workout_bp = Blueprint("workout", __name__, url_prefix="/workouts")
 api = Api(workout_bp)
 
 
