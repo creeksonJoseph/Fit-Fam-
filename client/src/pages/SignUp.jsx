@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Toast from "../components/Toast";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -8,6 +9,7 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showRequirements, setShowRequirements] = useState(false);
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,14 +27,27 @@ export default function SignUp() {
   const passwordsMatch = password === confirmPassword && confirmPassword !== "";
   const canSubmit = isPasswordValid && passwordsMatch;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (canSubmit) {
-      navigate('/dashboard');
+      try {
+        // Simulate signup API call
+        setToast({ message: "Sign up successful!", type: "success" });
+        setTimeout(() => navigate('/dashboard'), 1000);
+      } catch (error) {
+        setToast({ message: "Sign up failed!", type: "error" });
+      }
     }
   };
   return (
     <div className="bg-background-light dark:bg-background-dark font-display min-h-screen">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <AppHeader isAuthenticated={false} showAuthButtons={true} currentPage="signup" />
       <div className="flex flex-col min-h-screen">
       <main className="flex-grow flex items-center justify-center py-4 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">

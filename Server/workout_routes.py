@@ -7,6 +7,7 @@ workout_bp = Blueprint('workout', __name__)
 def save_workout_session():
     try:
         data = request.get_json()
+        print(f"Received data: {data}")  # Debug log
         
         # Extract data from request
         user_id = data.get('user_id')
@@ -14,8 +15,14 @@ def save_workout_session():
         duration = data.get('duration')
         description = data.get('description', '')
         
-        if not all([user_id, exercise_name, duration]):
-            return jsonify({'error': 'Missing required fields'}), 400
+        print(f"user_id: {user_id}, exercise_name: {exercise_name}, duration: {duration}")  # Debug log
+        
+        if user_id is None or not exercise_name or duration is None:
+            missing_fields = []
+            if not user_id: missing_fields.append('user_id')
+            if not exercise_name: missing_fields.append('exercise_name')
+            if not duration: missing_fields.append('duration')
+            return jsonify({'error': f'Missing required fields: {missing_fields}'}), 400
         
         # Check if workout exists, create if not
         workout = Workout.query.filter_by(name=exercise_name).first()

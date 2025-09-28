@@ -52,12 +52,13 @@ def create_app():
         users_list = [
             {
                 "id": user.id,
-                "name": user.name,
-                # Add other fields as needed, e.g. "email": user.email
+                "username": user.username,
+                "email": user.email,
+                "profile_image": user.profile_image
             }
             for user in users
         ]
-        return jsonify(users_list)
+        return jsonify(users_list), 200
 
     return app
 

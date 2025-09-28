@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
+import Toast from "../components/Toast";
 
 const WorkoutSession = () => {
   const { id } = useParams();
@@ -10,6 +11,7 @@ const WorkoutSession = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
+  const [toast, setToast] = useState(null);
   const intervalRef = useRef(null);
 
   const formatTime = (seconds) => {
@@ -42,13 +44,9 @@ const WorkoutSession = () => {
     try {
       const workoutData = {
         user_id: 1,
-        exercise_id: exercise.id,
         exercise_name: exercise.name,
-        duration: Math.floor(time / 60),
+        duration: Math.max(1, Math.floor(time / 60)),
         description: `${exercise.target} exercise using ${exercise.equipment}`,
-        bodyPart: exercise.bodyPart,
-        equipment: exercise.equipment,
-        target: exercise.target,
       };
 
       const response = await fetch("http://127.0.0.1:5000/workout-sessions", {
@@ -60,17 +58,19 @@ const WorkoutSession = () => {
       });
 
       if (response.ok) {
-        alert("Workout saved successfully!");
+        setToast({ message: "Workout saved successfully!", type: "success" });
         clearInterval(intervalRef.current);
         setTime(0);
         setIsRunning(false);
         setHasStarted(false);
       } else {
-        throw new Error("Failed to save workout");
+        const errorData = await response.json();
+        console.error("Server error:", errorData);
+        throw new Error(errorData.error || "Failed to save workout");
       }
     } catch (error) {
       console.error("Error saving workout:", error);
-      alert("Failed to save workout. Please try again.");
+      setToast({ message: "Workout save failed!", type: "error" });
     }
   };
 
@@ -139,6 +139,13 @@ const WorkoutSession = () => {
 
   return (
     <div className="bg-background-light font-display min-h-screen">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <AppHeader />
       <div className="flex min-h-screen">
         <Sidebar activeTab="workouts" />

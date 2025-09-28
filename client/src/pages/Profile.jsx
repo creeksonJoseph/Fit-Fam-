@@ -230,9 +230,6 @@ const Profile = () => {
                     <h3 className="text-lg font-semibold text-background-dark">
                       {username}
                     </h3>
-                    <p className="text-sm text-background-dark/60">
-                      Click the edit icon to change your profile picture
-                    </p>
                   </div>
                 </div>
                 <div className="space-y-4">
