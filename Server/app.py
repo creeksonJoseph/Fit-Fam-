@@ -16,9 +16,9 @@ from workout_routes import workout_bp as session_bp
 def create_app():
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
-        "DATABASE_URL", "sqlite:///fitness_app.db"
-    )
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        "DATABASE_URI")
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret")
 
