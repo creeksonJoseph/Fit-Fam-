@@ -8,7 +8,7 @@ const WorkoutDetail = () => {
   const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = 'https://fit-fam-server.onrender.com';
+  const BASE_URL = 'http://localhost:5000';
 
   useEffect(() => {
     const fetchExercise = () => {
@@ -18,13 +18,13 @@ const WorkoutDetail = () => {
         const exercises = JSON.parse(cachedExercises);
         const cachedExercise = exercises.find(ex => ex.id === id);
         if (cachedExercise) {
-          console.log('📦 Using cached exercise data for ID:', id);
+
           setExercise(cachedExercise);
         } else {
-          console.log('❌ Exercise not found in cache for ID:', id);
+
         }
       } else {
-        console.log('❌ No cached exercises found');
+
       }
       setLoading(false);
     };

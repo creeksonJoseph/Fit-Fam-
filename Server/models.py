@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from sqlalchemy_serializer import SerializerMixin
+import bcrypt
 
 db = SQLAlchemy()
 
@@ -11,6 +12,14 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    profile_image = db.Column(db.String(500), nullable=True)
+    
+    def set_password(self, password):
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
     # Relationships
     progress = db.relationship(
@@ -26,7 +35,7 @@ class User(db.Model, SerializerMixin):
         cascade="all, delete-orphan"
     )
 
-    serialize_only = ("id", "username", "email")
+    serialize_only = ("id", "username", "email", "profile_image")
 
 
 class Workout(db.Model, SerializerMixin):

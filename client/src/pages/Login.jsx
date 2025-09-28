@@ -1,23 +1,60 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import AppHeader from "../components/AppHeader";
+import Toast from "../components/Toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     // Wake up the server
     fetch('https://fit-fam-server.onrender.com/exercises').catch(() => {});
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/dashboard");
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    
+    try {
+      const response = await fetch('http://localhost:5000/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        login(data.user);
+        setToast({ message: "Login successful!", type: "success" });
+        
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+      } else {
+        const error = await response.json();
+        setToast({ message: error.error || "Login failed!", type: "error" });
+      }
+    } catch (error) {
+      setToast({ message: "Login failed!", type: "error" });
+    }
   };
 
   return (
     <div className="bg-background-light dark:bg-background-dark font-display min-h-screen">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <AppHeader isAuthenticated={false} showAuthButtons={true} currentPage="login" />
       <div className="flex flex-col min-h-screen">
         <main className="flex-grow flex items-center justify-center py-4 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">

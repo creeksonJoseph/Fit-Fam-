@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
@@ -10,6 +11,7 @@ const WorkoutSession = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('idle'); // 'idle', 'saving', 'saved', 'error'
   const intervalRef = useRef(null);
 
   const formatTime = (seconds) => {
@@ -32,41 +34,49 @@ const WorkoutSession = () => {
     }
   };
 
+  const { user } = useAuth();
+
   const handleSave = async () => {
-    if (!hasStarted || !exercise) return;
+    if (!hasStarted || isRunning || !exercise || !user) {
+      setSaveStatus('error');
+      return;
+    }
+    
+    setSaveStatus('saving');
     
     try {
       const workoutData = {
-        user_id: 1,
+        user_id: user.id,
         exercise_id: exercise.id,
         exercise_name: exercise.name,
-        duration: Math.floor(time / 60),
+        duration: Math.max(1, time),
         description: `${exercise.target} exercise using ${exercise.equipment}`,
         bodyPart: exercise.bodyPart,
         equipment: exercise.equipment,
         target: exercise.target
       };
       
-      const response = await fetch('https://group-fitness-app-db.onrender.com/workout-sessions', {
+      const response = await fetch('http://localhost:5000/workout-sessions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(workoutData)
       });
       
       if (response.ok) {
-        alert('Workout saved successfully!');
-        clearInterval(intervalRef.current);
+        setSaveStatus('saved');
         setTime(0);
-        setIsRunning(false);
         setHasStarted(false);
+        setTimeout(() => setSaveStatus('idle'), 2000);
       } else {
-        throw new Error('Failed to save workout');
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus('idle'), 3000);
       }
     } catch (error) {
-      console.error('Error saving workout:', error);
-      alert('Failed to save workout. Please try again.');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     }
   };
 
@@ -190,17 +200,35 @@ const WorkoutSession = () => {
                   </button>
                   <button 
                     onClick={handleSave}
-                    disabled={!hasStarted}
-                    className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-bold transition-transform hover:scale-105 sm:w-auto ${
-                      hasStarted 
-                        ? 'bg-green-500 text-white' 
+                    disabled={!hasStarted || isRunning || saveStatus === 'saving'}
+                    className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-bold transition-all sm:w-auto ${
+                      saveStatus === 'saved' 
+                        ? 'bg-green-600 text-white' 
+                        : saveStatus === 'saving'
+                        ? 'bg-blue-500 text-white'
+                        : saveStatus === 'error'
+                        ? 'bg-red-500 text-white'
+                        : hasStarted && !isRunning
+                        ? 'bg-green-500 text-white hover:scale-105' 
                         : 'bg-gray-200 text-gray-700 cursor-not-allowed'
                     }`}
                   >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
-                    </svg>
-                    Save
+                    {saveStatus === 'saving' ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : saveStatus === 'saved' ? (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : saveStatus === 'error' ? (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+                      </svg>
+                    )}
+                    {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : saveStatus === 'error' ? 'Error' : 'Save'}
                   </button>
                 </div>
               </div>

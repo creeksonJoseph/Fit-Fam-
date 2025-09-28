@@ -9,15 +9,33 @@ const Friends = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   
-  const BASE_URL = 'https://group-fitness-app-db.onrender.com';
-  const userId = 1;
+  const BASE_URL = 'http://localhost:5000';
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const fetchFriendsData = async () => {
       try {
+        // Get current user from session
+        const sessionRes = await fetch(`${BASE_URL}/users/session`, {
+          credentials: 'include'
+        });
+        
+        if (!sessionRes.ok) {
+          setLoading(false);
+          return;
+        }
+        
+        const sessionData = await sessionRes.json();
+        if (!sessionData.authenticated) {
+          setLoading(false);
+          return;
+        }
+        
+        const currentUserId = sessionData.user.id;
+        setUserId(currentUserId);
         const [usersRes, friendsRes] = await Promise.all([
-          fetch(`${BASE_URL}/users`),
-          fetch(`${BASE_URL}/friends/${userId}`)
+          fetch(`${BASE_URL}/users/`, { credentials: 'include' }),
+          fetch(`${BASE_URL}/friends/${currentUserId}`, { credentials: 'include' })
         ]);
         
         const users = await usersRes.json();
@@ -68,6 +86,7 @@ const Friends = () => {
       await fetch(`${BASE_URL}/friends/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           following_user_id: fromUserId,
           followed_user_id: userId,

@@ -6,23 +6,41 @@ const Notifications = () => {
   const [friendRequests, setFriendRequests] = useState({ incoming: [], outgoing: [] });
   const [loading, setLoading] = useState(true);
   
-  const BASE_URL = 'https://group-fitness-app-db.onrender.com';
-  const userId = 1; // TODO: Get from auth context
+  const BASE_URL = 'http://localhost:5000';
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
       try {
+        // Get current user from session
+        const sessionRes = await fetch(`${BASE_URL}/users/session`, {
+          credentials: 'include'
+        });
+        
+        if (!sessionRes.ok) {
+          setLoading(false);
+          return;
+        }
+        
+        const sessionData = await sessionRes.json();
+        if (!sessionData.authenticated) {
+          setLoading(false);
+          return;
+        }
+        
+        const currentUserId = sessionData.user.id;
+        setUserId(currentUserId);
         // Fetch all users to get user details
-        const usersRes = await fetch(`${BASE_URL}/users`);
+        const usersRes = await fetch(`${BASE_URL}/users/`, { credentials: 'include' });
         const users = await usersRes.json();
         const usersMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
         
         // Fetch all friend relationships
-        const friendsRes = await fetch(`${BASE_URL}/friends/${userId}`);
+        const friendsRes = await fetch(`${BASE_URL}/friends/${currentUserId}`, { credentials: 'include' });
         const friendsData = await friendsRes.json();
         
         // Get incoming requests (where current user is followed)
-        const allFriendsRes = await fetch(`${BASE_URL}/users`);
+        const allFriendsRes = await fetch(`${BASE_URL}/users/`, { credentials: 'include' });
         const allUsers = await allFriendsRes.json();
         
         const incomingRequests = [];
@@ -30,14 +48,14 @@ const Notifications = () => {
         
         // Check all users for friend relationships
         for (const user of allUsers) {
-          if (user.id === userId) continue;
+          if (user.id === currentUserId) continue;
           
-          const userFriendsRes = await fetch(`${BASE_URL}/friends/${user.id}`);
+          const userFriendsRes = await fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' });
           const userFriends = await userFriendsRes.json();
           
           // Check if this user sent a request to current user
           const sentToMe = Array.isArray(userFriends) ? userFriends.find(
-            f => f.followed_user_id === userId && f.status === 'pending'
+            f => f.followed_user_id === currentUserId && f.status === 'pending'
           ) : null;
           
           if (sentToMe) {
@@ -84,6 +102,7 @@ const Notifications = () => {
       await fetch(`${BASE_URL}/friends/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           following_user_id: userId,
           followed_user_id: fromUserId,

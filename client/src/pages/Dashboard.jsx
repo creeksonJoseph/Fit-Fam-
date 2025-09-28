@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
 
@@ -11,22 +12,32 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = "https://group-fitness-app-db.onrender.com";
-  const userId = 1; // TODO: Get from auth context
+  const BASE_URL = "http://localhost:5000";
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchProgressData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
       try {
+        const currentUserId = user.id;
         // Fetch user workout stats
-        const statsRes = await fetch(`${BASE_URL}/workout-sessions/${userId}/stats`);
-        const stats = await statsRes.json();
+        const statsRes = await fetch(`${BASE_URL}/workout-sessions/${currentUserId}/stats`, {
+          credentials: 'include'
+        });
+        const stats = statsRes.ok ? await statsRes.json() : {};
         
         const totalWorkouts = stats.total_workouts || 0;
         const avgDuration = stats.avg_duration || 0;
         
         // Fetch user progress for weekly calculation
-        const progressRes = await fetch(`${BASE_URL}/progress/${userId}`);
-        const userProgress = await progressRes.json();
+        const progressRes = await fetch(`${BASE_URL}/progress/${currentUserId}`, {
+          credentials: 'include'
+        });
+        const userProgress = progressRes.ok ? await progressRes.json() : [];
 
         // Calculate weekly progress (last 4 weeks)
         const now = new Date();
@@ -37,24 +48,27 @@ const Dashboard = () => {
           const weekEnd = new Date(weekStart);
           weekEnd.setDate(weekStart.getDate() + 6);
 
-          const weekWorkouts = userProgress.filter((p) => {
+          const weekWorkouts = Array.isArray(userProgress) ? userProgress.filter((p) => {
             const completedDate = new Date(p.time_completed);
             return completedDate >= weekStart && completedDate <= weekEnd;
-          }).length;
+          }).length : 0;
 
           weeklyProgress.push(weekWorkouts);
         }
 
         // Fetch all users for leaderboard
-        const usersRes = await fetch(`${BASE_URL}/users`);
-        const users = await usersRes.json();
+        const usersRes = await fetch(`${BASE_URL}/users/`, {
+          credentials: 'include'
+        });
+        const users = usersRes.ok ? await usersRes.json() : [];
 
         // Calculate leaderboard
-        const leaderboardPromises = users.map(async (user) => {
+        const leaderboardPromises = Array.isArray(users) ? users.map(async (user) => {
           const userProgressRes = await fetch(
-            `${BASE_URL}/progress/${user.id}`
+            `${BASE_URL}/progress/${user.id}`,
+            { credentials: 'include' }
           );
-          const userProgressData = await userProgressRes.json();
+          const userProgressData = userProgressRes.ok ? await userProgressRes.json() : [];
           return {
             id: user.id,
             username: user.username,
@@ -62,7 +76,7 @@ const Dashboard = () => {
               ? userProgressData.length
               : 0,
           };
-        });
+        }) : [];
 
         const leaderboardData = await Promise.all(leaderboardPromises);
         const sortedLeaderboard = leaderboardData
@@ -220,11 +234,11 @@ const Dashboard = () => {
                   Leaderboard
                 </h2>
                 <div className="space-y-3">
-                  {progressData.leaderboard.map((user, index) => {
-                    const isCurrentUser = user.id === userId;
+                  {progressData.leaderboard.map((leaderboardUser, index) => {
+                    const isCurrentUser = leaderboardUser.id === user?.id;
                     return (
                       <div
-                        key={user.id}
+                        key={leaderboardUser.id}
                         className={`flex items-center justify-between ${
                           isCurrentUser
                             ? "bg-primary/20 rounded-lg p-2 -m-2"
@@ -248,7 +262,7 @@ const Dashboard = () => {
                                 : "text-background-dark"
                             }`}
                           >
-                            {isCurrentUser ? "You" : user.username}
+                            {isCurrentUser ? "You" : leaderboardUser.username}
                           </p>
                         </div>
                         <p
@@ -258,7 +272,7 @@ const Dashboard = () => {
                               : "text-background-dark"
                           }`}
                         >
-                          {user.workoutCount}
+                          {leaderboardUser.workoutCount}
                         </p>
                       </div>
                     );

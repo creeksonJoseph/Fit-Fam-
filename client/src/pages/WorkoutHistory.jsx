@@ -7,7 +7,7 @@ const WorkoutHistory = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const BASE_URL = 'https://group-fitness-app-db.onrender.com';
+  const BASE_URL = 'http://localhost:5000';
   const userId = 1;
 
   useEffect(() => {
