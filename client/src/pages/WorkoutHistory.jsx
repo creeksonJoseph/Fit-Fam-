@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
@@ -8,23 +9,44 @@ const WorkoutHistory = () => {
   const [loading, setLoading] = useState(true);
   
   const BASE_URL = 'http://localhost:5000';
-  const userId = 1;
+  const EXERCISES_URL = 'https://fit-fam-server-1.onrender.com';
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchWorkoutHistory = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
       try {
-        const response = await fetch(`${BASE_URL}/workout-sessions/${userId}`);
-        const data = await response.json();
-        setWorkouts(data);
+        const [workoutRes, exercisesRes] = await Promise.all([
+          fetch(`${BASE_URL}/workout-sessions/${user.id}`, { credentials: 'include' }),
+          fetch(`${EXERCISES_URL}/exercises`)
+        ]);
+        
+        const workoutData = workoutRes.ok ? await workoutRes.json() : [];
+        const exercises = exercisesRes.ok ? await exercisesRes.json() : [];
+        
+        const workoutsWithBodyParts = Array.isArray(workoutData) ? workoutData.map(workout => {
+          const exercise = exercises.find(ex => ex.name.toLowerCase() === workout.name.toLowerCase());
+          return {
+            ...workout,
+            bodyPart: exercise?.bodyParts?.[0] || 'Unknown'
+          };
+        }) : [];
+        
+        setWorkouts(workoutsWithBodyParts);
       } catch (error) {
         console.error('Error fetching workout history:', error);
+        setWorkouts([]);
       } finally {
         setLoading(false);
       }
     };
     
     fetchWorkoutHistory();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -78,17 +100,28 @@ const WorkoutHistory = () => {
                 {workouts.map((workout, index) => (
                   <div key={index} className="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
                     <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-background-dark dark:text-white capitalize">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-background-dark dark:text-white capitalize mb-1">
                           {workout.name}
                         </h3>
-                        <p className="text-background-dark/60 dark:text-white/60">
-                          {workout.description}
-                        </p>
+                        <div className="flex items-center gap-4 text-sm text-background-dark/60 dark:text-white/60">
+                          <span className="capitalize">{workout.bodyPart}</span>
+                          <span>•</span>
+                          <span>{new Date(workout.time_completed).toLocaleDateString()}</span>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-bold text-primary">
-                          {workout.duration} min
+                          {(() => {
+                            const seconds = workout.duration;
+                            const hours = Math.floor(seconds / 3600);
+                            const minutes = Math.floor((seconds % 3600) / 60);
+                            const remainingSeconds = seconds % 60;
+                            
+                            if (hours > 0) return `${hours}h`;
+                            if (minutes > 0) return `${minutes}m`;
+                            return `${remainingSeconds}s`;
+                          })()} 
                         </p>
                         <p className="text-sm text-background-dark/60 dark:text-white/60">
                           Duration
@@ -96,12 +129,9 @@ const WorkoutHistory = () => {
                       </div>
                     </div>
                     
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-background-dark/60 dark:text-white/60">
-                        Completed on {new Date(workout.time_completed).toLocaleDateString()}
-                      </span>
-                      <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full">
-                        {workout.progress}
+                    <div className="flex justify-end">
+                      <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm">
+                        Completed
                       </span>
                     </div>
                   </div>
