@@ -49,6 +49,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setChecked(true);
+    sessionStorage.clear();
   };
 
   return (
