@@ -46,5 +46,63 @@ class UserProfile(Resource):
             return {"error": "User not found"}, 404
         return user.to_dict(), 200
 
+    def put(self, user_id):
+        try:
+            print(f"PUT request received for user_id: {user_id}")
+            user = User.query.get(user_id)
+            if not user:
+                print(f"User not found for id: {user_id}")
+                return {"error": "User not found"}, 404
+
+            data = request.get_json()
+            print(f"Request data: {data}")
+            
+            # Update username if provided
+            if "username" in data:
+                print(f"Updating username to: {data['username']}")
+                # Check if username is already taken by another user
+                existing_user = User.query.filter(
+                    User.username == data["username"],
+                    User.id != user_id
+                ).first()
+                if existing_user:
+                    print(f"Username already taken: {data['username']}")
+                    return {"error": "Username already taken"}, 400
+                user.username = data["username"]
+            
+            # Update email if provided
+            if "email" in data:
+                print(f"Updating email to: {data['email']}")
+                # Check if email is already taken by another user
+                existing_user = User.query.filter(
+                    User.email == data["email"],
+                    User.id != user_id
+                ).first()
+                if existing_user:
+                    print(f"Email already taken: {data['email']}")
+                    return {"error": "Email already taken"}, 400
+                user.email = data["email"]
+            
+            # Update profile image if provided
+            if "profile_image" in data:
+                print(f"Updating profile_image to: {data['profile_image']}")
+                user.profile_image = data["profile_image"]
+
+            print("Committing changes to database...")
+            db.session.commit()
+            print("Database commit successful")
+            
+            result = user.to_dict()
+            print(f"Returning updated user: {result}")
+            return result, 200
+            
+        except Exception as e:
+            print(f"Error in PUT /users/{user_id}: {str(e)}")
+            print(f"Error type: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            db.session.rollback()
+            return {"error": f"Internal server error: {str(e)}"}, 500
+
 
 api.add_resource(UserProfile, "/<int:user_id>")

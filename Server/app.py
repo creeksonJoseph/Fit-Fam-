@@ -3,7 +3,8 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_restful import Api
 from flask_migrate import Migrate
-from models import db
+from models import db, User  # Add this import
+
 
 from routes.User_routes import user_bp
 from routes.Workout_routes import workout_bp
@@ -27,7 +28,7 @@ def create_app():
         app.config['SESSION_COOKIE_SECURE'] = True
 
     db.init_app(app)
-    CORS(app)
+    CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
     Api(app)
     Migrate(app, db)
 
@@ -35,7 +36,7 @@ def create_app():
     app.register_blueprint(workout_bp, url_prefix="/workouts")
     app.register_blueprint(progress_bp, url_prefix="/progress")
     app.register_blueprint(friends_bp, url_prefix="/friends")
-    app.register_blueprint(workout_session_bp)
+    app.register_blueprint(workout_session_bp, name='workout_sessions')
 
     @app.errorhandler(404)
     def not_found(e):
@@ -44,6 +45,19 @@ def create_app():
     @app.errorhandler(500)
     def server_error(e):
         return jsonify({"error": "Internal Server Error"}), 500
+
+    @app.route('/users')
+    def get_users():
+        users = User.query.all()
+        users_list = [
+            {
+                "id": user.id,
+                "name": user.name,
+                # Add other fields as needed, e.g. "email": user.email
+            }
+            for user in users
+        ]
+        return jsonify(users_list)
 
     return app
 

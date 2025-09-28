@@ -17,6 +17,22 @@ class FriendList(Resource):
 
 api.add_resource(FriendList, "/<int:user_id>")
 
+class FriendCount(Resource):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        # Count accepted friends
+        friend_count = Friends.query.filter_by(
+            following_user_id=user_id, 
+            status='accepted'
+        ).count()
+        
+        return {"total_friends": friend_count}, 200
+
+api.add_resource(FriendCount, "/<int:user_id>/count")
+
 class FriendRequest(Resource):
     def post(self):
         data = request.get_json()

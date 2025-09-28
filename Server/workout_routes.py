@@ -102,3 +102,34 @@ def get_user_workout_stats(user_id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@workout_bp.route('/leaderboard', methods=['GET'])
+def get_leaderboard():
+    try:
+        from models import User
+        
+        # Get all users with their total workout duration
+        users_with_duration = db.session.query(
+            User.id,
+            User.username,
+            db.func.sum(Workout.duration).label('total_duration')
+        ).join(
+            UserProgress, User.id == UserProgress.user_id
+        ).join(
+            Workout, UserProgress.workout_id == Workout.id
+        ).group_by(User.id, User.username).order_by(
+            db.func.sum(Workout.duration).desc()
+        ).limit(5).all()
+        
+        leaderboard = []
+        for user_id, username, total_duration in users_with_duration:
+            leaderboard.append({
+                'id': user_id,
+                'username': username,
+                'total_duration': total_duration or 0
+            })
+        
+        return jsonify(leaderboard), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

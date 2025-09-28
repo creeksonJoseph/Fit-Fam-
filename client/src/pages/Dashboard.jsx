@@ -5,30 +5,35 @@ import AppHeader from "../components/AppHeader";
 const Dashboard = () => {
   const [progressData, setProgressData] = useState({
     totalWorkouts: 0,
-    avgDuration: 0,
+    totalDuration: 0,
+    totalFriends: 0,
     weeklyProgress: [],
     leaderboard: [],
   });
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = "https://group-fitness-app-db.onrender.com";
+  const BASE_URL = "http://127.0.0.1:5000";
   const userId = 1; // TODO: Get from auth context
 
   useEffect(() => {
     const fetchProgressData = async () => {
       try {
         // Fetch user workout stats
-        const statsRes = await fetch(`${BASE_URL}/workout-sessions/${userId}/stats`);
+        const statsRes = await fetch(
+          `${BASE_URL}/workout-sessions/${userId}/stats`
+        );
         const stats = await statsRes.json();
-        
-        const totalWorkouts = stats.total_workouts || 0;
-        const avgDuration = stats.avg_duration || 0;
-        
-        // Fetch user progress for weekly calculation
-        const progressRes = await fetch(`${BASE_URL}/progress/${userId}`);
-        const userProgress = await progressRes.json();
 
-        // Calculate weekly progress (last 4 weeks)
+        const totalWorkouts = stats.total_workouts || 0;
+        const totalDuration = stats.total_duration || 0;
+
+        // Fetch user workout sessions (successfully saved workouts)
+        const sessionsRes = await fetch(
+          `${BASE_URL}/workout-sessions/${userId}`
+        );
+        const userSessions = await sessionsRes.json();
+
+        // Calculate weekly progress (last 4 weeks) from successfully saved workouts
         const now = new Date();
         const weeklyProgress = [];
         for (let i = 3; i >= 0; i--) {
@@ -37,43 +42,29 @@ const Dashboard = () => {
           const weekEnd = new Date(weekStart);
           weekEnd.setDate(weekStart.getDate() + 6);
 
-          const weekWorkouts = userProgress.filter((p) => {
-            const completedDate = new Date(p.time_completed);
+          const weekWorkouts = userSessions.filter((session) => {
+            const completedDate = new Date(session.time_completed);
             return completedDate >= weekStart && completedDate <= weekEnd;
           }).length;
 
           weeklyProgress.push(weekWorkouts);
         }
 
-        // Fetch all users for leaderboard
-        const usersRes = await fetch(`${BASE_URL}/users`);
-        const users = await usersRes.json();
+        // Fetch total friends count
+        const friendsRes = await fetch(`${BASE_URL}/friends/${userId}/count`);
+        const friendsData = await friendsRes.json();
+        const totalFriends = friendsData.total_friends || 0;
 
-        // Calculate leaderboard
-        const leaderboardPromises = users.map(async (user) => {
-          const userProgressRes = await fetch(
-            `${BASE_URL}/progress/${user.id}`
-          );
-          const userProgressData = await userProgressRes.json();
-          return {
-            id: user.id,
-            username: user.username,
-            workoutCount: Array.isArray(userProgressData)
-              ? userProgressData.length
-              : 0,
-          };
-        });
-
-        const leaderboardData = await Promise.all(leaderboardPromises);
-        const sortedLeaderboard = leaderboardData
-          .sort((a, b) => b.workoutCount - a.workoutCount)
-          .slice(0, 5);
+        // Fetch leaderboard by total duration
+        const leaderboardRes = await fetch(`${BASE_URL}/leaderboard`);
+        const leaderboardData = await leaderboardRes.json();
 
         setProgressData({
           totalWorkouts,
-          avgDuration,
+          totalDuration,
+          totalFriends,
           weeklyProgress,
-          leaderboard: sortedLeaderboard,
+          leaderboard: leaderboardData,
         });
       } catch (error) {
         console.error("Error fetching progress data:", error);
@@ -141,10 +132,10 @@ const Dashboard = () => {
               <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-base text-background-dark">
-                    Avg. Duration
+                    Total Duration
                   </h3>
                   <span className="text-primary text-2xl font-bold">
-                    {progressData.avgDuration}
+                    {progressData.totalDuration}
                     <span className="text-base">min</span>
                   </span>
                 </div>
@@ -152,33 +143,33 @@ const Dashboard = () => {
                   <div
                     className="h-2 bg-primary rounded-full"
                     style={{
-                      width: `${Math.min((progressData.avgDuration / 60) * 100, 100)}%`,
+                      width: `${Math.min((progressData.totalDuration / 1000) * 100, 100)}%`,
                     }}
                   ></div>
                 </div>
                 <p className="text-sm text-background-dark/60">
-                  Compared to last week
+                  Total time you've grinded
                 </p>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-base text-background-dark">
-                    Calories Burned
+                    Total Friends
                   </h3>
                   <span className="text-primary text-2xl font-bold">
-                    {progressData.totalWorkouts * 300}
+                    {progressData.totalFriends}
                   </span>
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full">
                   <div
                     className="h-2 bg-primary rounded-full"
                     style={{
-                      width: `${Math.min(((progressData.totalWorkouts * 300) / 2500) * 100, 100)}%`,
+                      width: `${Math.min((progressData.totalFriends / 10) * 100, 100)}%`,
                     }}
                   ></div>
                 </div>
                 <p className="text-sm text-background-dark/60">
-                  Weekly goal met
+                  Fitness buddies connected
                 </p>
               </div>
             </div>
@@ -193,9 +184,7 @@ const Dashboard = () => {
                       <div className="w-full bg-gray-200 rounded-t-lg relative">
                         <div
                           className={`absolute bottom-0 w-full rounded-t ${
-                            index === 3
-                              ? "bg-primary"
-                              : "bg-primary/20"
+                            index === 3 ? "bg-primary" : "bg-primary/20"
                           }`}
                           style={{
                             height: `${(workouts / maxWeeklyWorkouts) * 100}%`,
@@ -258,7 +247,7 @@ const Dashboard = () => {
                               : "text-background-dark"
                           }`}
                         >
-                          {user.workoutCount}
+                          {user.total_duration}min
                         </p>
                       </div>
                     );

@@ -11,6 +11,7 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    profile_image = db.Column(db.String(500), nullable=True)
 
     # Relationships
     progress = db.relationship(
@@ -26,7 +27,7 @@ class User(db.Model, SerializerMixin):
         cascade="all, delete-orphan"
     )
 
-    serialize_only = ("id", "username", "email")
+    serialize_only = ("id", "username", "email", "profile_image")
 
 
 class Workout(db.Model, SerializerMixin):

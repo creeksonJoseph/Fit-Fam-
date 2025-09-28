@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import AppHeader from '../components/AppHeader';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import AppHeader from "../components/AppHeader";
 
 const Friends = () => {
   const [friends, setFriends] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  
-  const BASE_URL = 'https://group-fitness-app-db.onrender.com';
+
+  const BASE_URL = "http://127.0.0.1:5000";
   const userId = 1;
 
   useEffect(() => {
@@ -17,86 +17,97 @@ const Friends = () => {
       try {
         const [usersRes, friendsRes] = await Promise.all([
           fetch(`${BASE_URL}/users`),
-          fetch(`${BASE_URL}/friends/${userId}`)
+          fetch(`${BASE_URL}/friends/${userId}`),
         ]);
-        
+
         const users = await usersRes.json();
         const friendsData = await friendsRes.json();
-        const usersMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
-        
+        const usersMap = users.reduce(
+          (acc, user) => ({ ...acc, [user.id]: user }),
+          {}
+        );
+
         const acceptedFriends = [];
         const pending = [];
-        
+
         if (Array.isArray(friendsData)) {
-          friendsData.forEach(friend => {
+          friendsData.forEach((friend) => {
             const friendUser = usersMap[friend.followed_user_id];
             if (friendUser) {
-              if (friend.status === 'accepted') {
+              if (friend.status === "accepted") {
                 acceptedFriends.push({
                   id: friendUser.id,
                   username: friendUser.username,
                   email: friendUser.email,
                   isOnline: Math.random() > 0.5,
-                  lastActive: Math.random() > 0.7 ? 'Active now' : `${Math.floor(Math.random() * 5) + 1}d ago`
+                  lastActive:
+                    Math.random() > 0.7
+                      ? "Active now"
+                      : `${Math.floor(Math.random() * 5) + 1}d ago`,
                 });
-              } else if (friend.status === 'pending') {
+              } else if (friend.status === "pending") {
                 pending.push({
                   id: friendUser.id,
                   username: friendUser.username,
                   email: friendUser.email,
-                  mutualFriends: Math.floor(Math.random() * 5)
+                  mutualFriends: Math.floor(Math.random() * 5),
                 });
               }
             }
           });
         }
-        
+
         setFriends(acceptedFriends);
         setPendingRequests(pending);
       } catch (error) {
-        console.error('Error fetching friends data:', error);
+        console.error("Error fetching friends data:", error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchFriendsData();
   }, []);
-  
+
   const handleAcceptRequest = async (fromUserId) => {
     try {
       await fetch(`${BASE_URL}/friends/request`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           following_user_id: fromUserId,
           followed_user_id: userId,
-          status: 'accepted'
-        })
+          status: "accepted",
+        }),
       });
-      
-      const acceptedUser = pendingRequests.find(req => req.id === fromUserId);
+
+      const acceptedUser = pendingRequests.find((req) => req.id === fromUserId);
       if (acceptedUser) {
-        setFriends(prev => [...prev, {
-          ...acceptedUser,
-          isOnline: Math.random() > 0.5,
-          lastActive: 'Active now'
-        }]);
-        setPendingRequests(prev => prev.filter(req => req.id !== fromUserId));
+        setFriends((prev) => [
+          ...prev,
+          {
+            ...acceptedUser,
+            isOnline: Math.random() > 0.5,
+            lastActive: "Active now",
+          },
+        ]);
+        setPendingRequests((prev) =>
+          prev.filter((req) => req.id !== fromUserId)
+        );
       }
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+      console.error("Error accepting friend request:", error);
     }
   };
-  
+
   const handleDeclineRequest = (fromUserId) => {
-    setPendingRequests(prev => prev.filter(req => req.id !== fromUserId));
+    setPendingRequests((prev) => prev.filter((req) => req.id !== fromUserId));
   };
-  
-  const filteredFriends = friends.filter(friend => 
+
+  const filteredFriends = friends.filter((friend) =>
     friend.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   if (loading) {
     return (
       <div className="bg-background-light font-display text-text-light">
@@ -118,8 +129,13 @@ const Friends = () => {
         <Sidebar activeTab="friends" />
         <main className="flex-1 p-6 pb-24 lg:pb-8 lg:ml-80">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-6">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-background-dark">Friends</h1>
-            <Link to="/add-friends" className="bg-primary text-black font-medium py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-all text-sm">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-background-dark">
+              Friends
+            </h1>
+            <Link
+              to="/add-friends"
+              className="bg-primary text-black font-medium py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-all text-sm"
+            >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
               </svg>
@@ -129,8 +145,16 @@ const Friends = () => {
 
           <div className="mb-8">
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-background-dark/50" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-background-dark/50"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                />
               </svg>
               <input
                 className="w-full bg-white border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-background-dark/50 text-sm"
@@ -144,27 +168,38 @@ const Friends = () => {
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Your Friends ({filteredFriends.length})</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                Your Friends ({filteredFriends.length})
+              </h3>
               {filteredFriends.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-background-dark/60 text-sm">
-                    {searchTerm ? 'No friends found matching your search.' : 'No friends yet. Start by adding some friends!'}
+                    {searchTerm
+                      ? "No friends found matching your search."
+                      : "No friends yet. Start by adding some friends!"}
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredFriends.map((friend) => (
-                    <div key={friend.id} className="flex items-center gap-3 p-3 bg-white rounded-lg">
+                    <div
+                      key={friend.id}
+                      className="flex items-center gap-3 p-3 bg-white rounded-lg"
+                    >
                       <div className="relative">
                         <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-semibold text-base">{friend.username.charAt(0).toUpperCase()}</span>
+                          <span className="text-primary font-semibold text-base">
+                            {friend.username.charAt(0).toUpperCase()}
+                          </span>
                         </div>
                         {friend.isOnline && (
                           <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary rounded-full border-2 border-white"></div>
                         )}
                       </div>
                       <div>
-                        <p className="font-semibold text-base">{friend.username}</p>
+                        <p className="font-semibold text-base">
+                          {friend.username}
+                        </p>
                         <p className="text-sm text-background-dark/60">
                           {friend.lastActive}
                         </p>
@@ -176,21 +211,32 @@ const Friends = () => {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4">Pending Requests ({pendingRequests.length})</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                Pending Requests ({pendingRequests.length})
+              </h3>
               {pendingRequests.length === 0 ? (
                 <div className="text-center py-6">
-                  <p className="text-background-dark/60 text-sm">No pending friend requests</p>
+                  <p className="text-background-dark/60 text-sm">
+                    No pending friend requests
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {pendingRequests.map((request) => (
-                    <div key={request.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                    <div
+                      key={request.id}
+                      className="flex items-center justify-between p-3 bg-white rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-semibold text-base">{request.username.charAt(0).toUpperCase()}</span>
+                          <span className="text-primary font-semibold text-base">
+                            {request.username.charAt(0).toUpperCase()}
+                          </span>
                         </div>
                         <div>
-                          <p className="font-semibold text-base">{request.username}</p>
+                          <p className="font-semibold text-base">
+                            {request.username}
+                          </p>
                           <p className="text-sm text-background-dark/60">
                             {request.mutualFriends} mutual friends
                           </p>
@@ -202,8 +248,16 @@ const Friends = () => {
                           className="bg-primary text-black p-2 rounded-full hover:bg-opacity-80 transition-opacity"
                           aria-label="Accept request"
                         >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </button>
                         <button
@@ -211,8 +265,16 @@ const Friends = () => {
                           className="bg-gray-200 text-background-dark p-2 rounded-full hover:bg-gray-300 transition-colors"
                           aria-label="Decline request"
                         >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </button>
                       </div>

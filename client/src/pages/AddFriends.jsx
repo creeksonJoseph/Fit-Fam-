@@ -9,7 +9,7 @@ const AddFriends = () => {
   const [loading, setLoading] = useState(true);
   const [sentRequests, setSentRequests] = useState(new Set());
 
-  const BASE_URL = "https://group-fitness-app-db.onrender.com";
+  const BASE_URL = "http://127.0.0.1:5000";
   const userId = 1;
 
   useEffect(() => {
