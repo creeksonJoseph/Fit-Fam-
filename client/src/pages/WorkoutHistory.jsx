@@ -8,7 +8,7 @@ const WorkoutHistory = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const BASE_URL = 'http://localhost:5000';
+  const BASE_URL = 'https://group-fitness-app.onrender.com';
   const EXERCISES_URL = 'https://fit-fam-server-1.onrender.com';
   const { user } = useAuth();
 

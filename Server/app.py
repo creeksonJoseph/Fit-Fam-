@@ -28,7 +28,11 @@ def create_app():
 
     db.init_app(app)
     Session(app)  # Initialize Flask-Session
-    CORS(app, origins=['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://localhost:5000'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
+    CORS(app, 
+         origins=['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://localhost:5000', 'https://group-fitness-app.onrender.com'], 
+         supports_credentials=True, 
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
     Api(app)
     Migrate(app, db)
 
@@ -37,6 +41,10 @@ def create_app():
     app.register_blueprint(progress_bp, url_prefix="/progress")
     app.register_blueprint(friends_bp, url_prefix="/friends")
     app.register_blueprint(workout_session_bp, url_prefix="/workout-sessions")
+
+    @app.route('/health')
+    def health_check():
+        return jsonify({"status": "healthy", "message": "Server is running"}), 200
 
     @app.errorhandler(404)
     def not_found(e):
