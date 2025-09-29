@@ -38,7 +38,7 @@ const WorkoutHistory = () => {
         
         setWorkouts(workoutsWithBodyParts);
       } catch (error) {
-        console.error('Error fetching workout history:', error);
+
         setWorkouts([]);
       } finally {
         setLoading(false);

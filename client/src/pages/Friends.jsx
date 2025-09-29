@@ -76,7 +76,7 @@ const Friends = () => {
         setFriends(acceptedFriends);
         setPendingRequests(pending);
       } catch (error) {
-        console.error('Error fetching friends data:', error);
+
       } finally {
         setLoading(false);
       }
@@ -104,7 +104,7 @@ const Friends = () => {
         setPendingRequests(prev => prev.filter(req => req.id !== fromUserId));
       }
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+
     }
   };
   

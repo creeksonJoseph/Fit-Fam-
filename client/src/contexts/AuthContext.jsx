@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Session check failed:', error);
+
     } finally {
       setLoading(false);
       setChecked(true);
