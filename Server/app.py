@@ -22,12 +22,24 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret")
 
-    # Standard Flask session configuration
+    # Session configuration for production
     app.config['SESSION_PERMANENT'] = False
-    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_KEY_PREFIX'] = 'fitfam:'
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+    
+    # Use filesystem for local, but fallback to default for production
+    if os.getenv('FLASK_ENV') == 'development':
+        app.config['SESSION_TYPE'] = 'filesystem'
+    else:
+        # Use default Flask sessions for production
+        pass
 
     db.init_app(app)
-    Session(app)  # Initialize Flask-Session
+    if os.getenv('FLASK_ENV') == 'development':
+        Session(app)  # Initialize Flask-Session only in development
     CORS(app, 
          origins=['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://localhost:5000', 'https://group-fitness-app.onrender.com'], 
          supports_credentials=True, 
