@@ -56,7 +56,7 @@ const WorkoutSession = () => {
         target: exercise.target
       };
       
-      const response = await fetch('https://group-fitness-app.onrender.com/workout-sessions', {
+      const response = await fetch('https://group-fitness-app.onrender.com/workout-sessions/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

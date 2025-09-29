@@ -53,7 +53,7 @@ const AddFriends = () => {
         setUsers(availableUsers);
         setSentRequests(pendingIds);
       } catch (error) {
-        console.error("Error fetching users:", error);
+
         setUsers([]);
       } finally {
         setLoading(false);
@@ -64,14 +64,14 @@ const AddFriends = () => {
   }, [user]);
 
   const handleAddFriend = async (targetUserId) => {
-    console.log('AddFriends: Sending friend request to user:', targetUserId);
+
     try {
       const requestBody = {
         following_user_id: user.id,
         followed_user_id: targetUserId,
         status: "pending",
       };
-      console.log('AddFriends: Request body:', requestBody);
+
       
       const response = await fetch(`${BASE_URL}/friends/request`, {
         method: "POST",
@@ -80,13 +80,13 @@ const AddFriends = () => {
         body: JSON.stringify(requestBody),
       });
       
-      console.log('AddFriends: Response status:', response.status);
+
       const responseData = await response.json();
-      console.log('AddFriends: Response data:', responseData);
+
 
       setSentRequests((prev) => new Set([...prev, targetUserId]));
     } catch (error) {
-      console.error("AddFriends: Error sending friend request:", error);
+
     }
   };
 

@@ -12,47 +12,45 @@ const Notifications = () => {
 
   const fetchFriendRequests = async () => {
     if (!user) {
-      console.log('Notifications: No user found, skipping fetch');
+
       setLoading(false);
       return;
     }
     
-    console.log('Notifications: Fetching friend requests for user:', user.id, user.username);
+
     setLoading(true);
     try {
-      console.log('Notifications: Making API calls...');
+
       const [usersRes, friendsRes] = await Promise.all([
         fetch(`${BASE_URL}/users/`, { credentials: 'include' }),
         fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' })
       ]);
       
-      console.log('Notifications: Users response status:', usersRes.status);
-      console.log('Notifications: Friends response status:', friendsRes.status);
+
       
       const users = usersRes.ok ? await usersRes.json() : [];
       const friendsData = friendsRes.ok ? await friendsRes.json() : [];
       
-      console.log('Notifications: Users data:', users);
-      console.log('Notifications: Friends data:', friendsData);
+
       
       const usersMap = users.reduce((acc, u) => ({ ...acc, [u.id]: u }), {});
-      console.log('Notifications: Users map:', usersMap);
+
       
       const incomingRequests = [];
       const outgoingRequests = [];
       
       if (Array.isArray(friendsData)) {
-        console.log('Notifications: Processing', friendsData.length, 'friend relationships');
+
         friendsData.forEach((friend, index) => {
-          console.log(`Notifications: Processing friend ${index + 1}:`, friend);
+
           
           if (friend.status === 'pending') {
             // Incoming: where current user is followed_user_id
             if (friend.followed_user_id === user.id) {
-              console.log('Notifications: Found incoming request from user:', friend.following_user_id);
+
               const requesterUser = usersMap[friend.following_user_id];
               if (requesterUser) {
-                console.log('Notifications: Adding incoming request:', requesterUser.username);
+
                 incomingRequests.push({
                   id: requesterUser.id,
                   username: requesterUser.username,
@@ -60,15 +58,15 @@ const Notifications = () => {
                   mutualFriends: Math.floor(Math.random() * 5)
                 });
               } else {
-                console.log('Notifications: Requester user not found in users map:', friend.following_user_id);
+
               }
             }
             // Outgoing: where current user is following_user_id
             else if (friend.following_user_id === user.id) {
-              console.log('Notifications: Found outgoing request to user:', friend.followed_user_id);
+
               const followedUser = usersMap[friend.followed_user_id];
               if (followedUser) {
-                console.log('Notifications: Adding outgoing request:', followedUser.username);
+
                 outgoingRequests.push({
                   id: followedUser.id,
                   username: followedUser.username,
@@ -76,16 +74,16 @@ const Notifications = () => {
                   status: 'pending'
                 });
               } else {
-                console.log('Notifications: Followed user not found in users map:', friend.followed_user_id);
+
               }
             }
           } else if (friend.status === 'accepted') {
-            console.log('Notifications: Found accepted friendship:', friend);
+
             // Show accepted requests in outgoing section
             if (friend.following_user_id === user.id) {
               const followedUser = usersMap[friend.followed_user_id];
               if (followedUser) {
-                console.log('Notifications: Adding accepted outgoing:', followedUser.username);
+
                 outgoingRequests.push({
                   id: followedUser.id,
                   username: followedUser.username,
@@ -99,7 +97,7 @@ const Notifications = () => {
             else if (friend.followed_user_id === user.id) {
               const requesterUser = usersMap[friend.following_user_id];
               if (requesterUser) {
-                console.log('Notifications: Adding accepted incoming:', requesterUser.username);
+
                 outgoingRequests.push({
                   id: requesterUser.id,
                   username: requesterUser.username,
@@ -112,15 +110,14 @@ const Notifications = () => {
           }
         });
       } else {
-        console.log('Notifications: Friends data is not an array:', typeof friendsData);
+
       }
       
-      console.log('Notifications: Final incoming requests:', incomingRequests);
-      console.log('Notifications: Final outgoing requests:', outgoingRequests);
+
       
       setFriendRequests({ incoming: incomingRequests, outgoing: outgoingRequests });
     } catch (error) {
-      console.error('Notifications: Error fetching friend requests:', error);
+
       setFriendRequests({ incoming: [], outgoing: [] });
     } finally {
       setLoading(false);
@@ -144,14 +141,14 @@ const Notifications = () => {
   }, [user]);
   
   const handleAcceptRequest = async (fromUserId) => {
-    console.log('Notifications: Accepting request from user:', fromUserId);
+
     try {
       const requestBody = {
         following_user_id: fromUserId,
         followed_user_id: user.id,
         status: 'accepted'
       };
-      console.log('Notifications: Accept request body:', requestBody);
+
       
       const response = await fetch(`${BASE_URL}/friends/request`, {
         method: 'POST',
@@ -160,14 +157,14 @@ const Notifications = () => {
         body: JSON.stringify(requestBody)
       });
       
-      console.log('Notifications: Accept response status:', response.status);
+
       const responseData = await response.json();
-      console.log('Notifications: Accept response data:', responseData);
+
       
       // Refetch to get updated data
       fetchFriendRequests();
     } catch (error) {
-      console.error('Notifications: Error accepting friend request:', error);
+
     }
   };
   
@@ -180,13 +177,13 @@ const Notifications = () => {
   };
   
   const handleCancelRequest = async (toUserId) => {
-    console.log('Notifications: Cancelling request to user:', toUserId);
+
     try {
       const requestBody = {
         following_user_id: user.id,
         followed_user_id: toUserId
       };
-      console.log('Notifications: Cancel request body:', requestBody);
+
       
       const response = await fetch(`${BASE_URL}/friends/request`, {
         method: 'DELETE',
@@ -195,14 +192,14 @@ const Notifications = () => {
         body: JSON.stringify(requestBody)
       });
       
-      console.log('Notifications: Cancel response status:', response.status);
+
       const responseData = await response.json();
-      console.log('Notifications: Cancel response data:', responseData);
+
       
       // Refetch to get updated data
       fetchFriendRequests();
     } catch (error) {
-      console.error('Notifications: Error cancelling friend request:', error);
+
     }
   };
   

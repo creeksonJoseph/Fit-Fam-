@@ -37,7 +37,7 @@ const Profile = () => {
       });
       setIsEditingUsername(false);
     } catch (error) {
-      console.error('Error updating username:', error);
+
     }
   };
   
@@ -52,7 +52,7 @@ const Profile = () => {
       });
       setIsEditingEmail(false);
     } catch (error) {
-      console.error('Error updating email:', error);
+
     }
   };
 
@@ -86,7 +86,7 @@ const Profile = () => {
         setProfileImage(imageUrl);
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
+
     } finally {
       setUploading(false);
     }
