@@ -32,7 +32,7 @@ def create_app():
 
     db.init_app(app)
     CORS(app, 
-         origins=['https://fit-fam.onrender.com', 'https://group-fitness-app.onrender.com', 'https://fit-fam.onrender.com', 'https://fit-fam.onrender.com', 'https://group-fitness-app.onrender.com'], 
+         origins=['https://fit-fam.onrender.com', 'https://group-fitness-app.onrender.com'], 
          supports_credentials=True, 
          allow_headers=['Content-Type', 'Authorization'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
