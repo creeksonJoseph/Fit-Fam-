@@ -1,88 +1,67 @@
-# seed.py
+from app import create_app, db
+from models import User, Workout, UserProgress, Friends
+from datetime import datetime, timedelta
 import random
-from app import app
-from models import db, User, Workout, UserProgress, Friends
 
-random.seed(42)  # Optional: for reproducibility
-
-# Sample data
-USERNAMES = [
-    "zacky", "sarah", "john", "alice", "bob", "charlie", "diana", "eric", "fiona", "george",
-    "hannah", "ian", "julia", "kevin", "laura", "mike", "nina", "oliver", "paula", "quinn",
-    "rachel", "sam", "tina", "ursula", "victor", "wendy", "xander", "yasmin", "zane", "amy",
-    "brian", "claire", "derek", "eva", "fred"
-]
-
-WORKOUTS = [
-    {"name": "Morning Run", "description": "5km jog around the park", "duration": 30},
-    {"name": "Yoga Session", "description": "30 mins of yoga flow", "duration": 30},
-    {"name": "Strength Training", "description": "Upper body workout", "duration": 45}
-]
-
-PROGRESS_STATUSES = ["Not Started", "In Progress", "Completed"]
-FRIENDSHIP_STATUSES = ["accepted", "pending", "blocked"]
+app = create_app()
 
 with app.app_context():
-    # Reset the database
+    # Reset database
     db.drop_all()
     db.create_all()
 
-    #Create Users
-    users = []
-    for username in USERNAMES:
-        email = f"{username}@example.com"
-        user = User(username=username, email=email)
-        db.session.add(user)
-        users.append(user)
+    # ---------- Users ----------
+    users = [
+        User(username="alice", email="alice@example.com", profile_image="https://i.pravatar.cc/150?img=1"),
+        User(username="bob", email="bob@example.com", profile_image="https://i.pravatar.cc/150?img=2"),
+        User(username="charlie", email="charlie@example.com", profile_image="https://i.pravatar.cc/150?img=3"),
+        User(username="diana", email="diana@example.com", profile_image="https://i.pravatar.cc/150?img=4"),
+    ]
 
-    db.session.commit()
-    print(f"✅ Created {len(users)} users.")
-
-    #Create Workouts
-    workouts = []
-    for w in WORKOUTS:
-        workout = Workout(**w)
-        db.session.add(workout)
-        workouts.append(workout)
-
-    db.session.commit()
-    print(f"✅ Created {len(workouts)} workouts.")
-
-    #Create Random User Progress
-    progress_entries = []
+    # Set passwords
     for user in users:
-        for workout in workouts:
-            if random.random() < 0.4: #40% chance to have progress
-                progress = UserProgress(
-                    user_id=user.id,
-                    workout_id=workout.id,
-                    progress=random.choice(PROGRESS_STATUSES),
-                    notes=f"Progress for {workout.name.lower()}"
-                )
-                db.session.add(progress)
-                progress_entries.append(progress)
+        user.set_password("password123")
+        db.session.add(user)
 
     db.session.commit()
-    print(f"✅ Created {len(progress_entries)} user progress entries.")
 
-    #Create Random Friendships
-    friend_links = set()
-    friends = []
+    # ---------- Workouts ----------
+    workouts = [
+        Workout(name="Push Ups", description="Standard push ups", duration=10),
+        Workout(name="Plank", description="Hold plank position", duration=5),
+        Workout(name="Squats", description="Bodyweight squats", duration=15),
+        Workout(name="Running", description="Run around track", duration=30),
+        Workout(name="Burpees", description="High intensity burpees", duration=12),
+    ]
 
-    while len(friends) < 50:
-        u1, u2 = random.sample(users, 2)
-        key = (u1.id, u2.id)
-        if u1.id != u2.id and key not in friend_links:
-            friend_links.add(key)
-            f = Friends(
-                following_user_id=u1.id,
-                followed_user_id=u2.id,
-                status=random.choice(FRIENDSHIP_STATUSES)
+    db.session.add_all(workouts)
+    db.session.commit()
+
+    # ---------- User Progress ----------
+    progress_entries = []
+    for i in range(1, 11):  # 10 progress logs
+        progress_entries.append(
+            UserProgress(
+                user_id=random.choice(users).id,
+                workout_id=random.choice(workouts).id,
+                progress=random.choice(["completed", "in progress", "skipped"]),
+                time_completed=datetime.utcnow() - timedelta(days=random.randint(1, 10)),
+                notes=random.choice(["Felt great!", "Tough session", "Need to improve form", None])
             )
-            db.session.add(f)
-            friends.append(f)
+        )
 
+    db.session.add_all(progress_entries)
     db.session.commit()
-    print(f"✅ Created {len(friends)} friend relationships.")
 
-    print("🎉 Database seeded successfully!")
+    # ---------- Friends ----------
+    friends = [
+        Friends(following_user_id=users[0].id, followed_user_id=users[1].id, status="accepted"),
+        Friends(following_user_id=users[0].id, followed_user_id=users[2].id, status="pending"),
+        Friends(following_user_id=users[1].id, followed_user_id=users[3].id, status="accepted"),
+        Friends(following_user_id=users[2].id, followed_user_id=users[3].id, status="blocked"),
+    ]
+
+    db.session.add_all(friends)
+    db.session.commit()
+
+    print("✅ Database seeded with sample users, workouts, progress, and friends!")
