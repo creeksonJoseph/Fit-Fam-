@@ -7,18 +7,18 @@ from flask_session import Session
 from models import db, User
 
 from routes.User_routes import user_bp
-from routes.Workout_routes import workout_bp
+from routes.Workout_routes import  workout_bp
 from routes.Progress_routes import progress_bp
 from routes.Friends_routes import friends_bp
-from workout_routes import workout_bp as session_bp
+from routes.Workout_session_routes import workout_session_bp
 
 
 def create_app():
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
-        "DATABASE_URL", "sqlite:///fitness_app.db"
-    )
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        "DATABASE_URI")
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret")
 
@@ -36,7 +36,7 @@ def create_app():
     app.register_blueprint(workout_bp, url_prefix="/workouts")
     app.register_blueprint(progress_bp, url_prefix="/progress")
     app.register_blueprint(friends_bp, url_prefix="/friends")
-    app.register_blueprint(session_bp)
+    app.register_blueprint(workout_session_bp, url_prefix="/workout-sessions")
 
     @app.errorhandler(404)
     def not_found(e):
