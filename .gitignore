@@ -5,3 +5,4 @@ __pycache__/
 *.db
 flask_session/
 *.txt
+!requirements.txt
