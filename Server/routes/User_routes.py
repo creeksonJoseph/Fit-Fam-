@@ -49,7 +49,7 @@ class UserLogin(Resource):
     def post(self):
         data = request.get_json()
         email = data.get("email")
-        username = data.get("username")  # Keep for backward compatibility
+        username = data.get("username")  
         password = data.get("password")
 
         if not (email or username) or not password:
