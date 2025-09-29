@@ -24,7 +24,7 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch('http://localhost:5000/users/login', {
+      const response = await fetch('https://group-fitness-app.onrender.com/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
 
@@ -9,33 +10,20 @@ const Friends = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   
-  const BASE_URL = 'http://localhost:5000';
-  const [userId, setUserId] = useState(null);
+  const BASE_URL = 'https://group-fitness-app.onrender.com';
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchFriendsData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
       try {
-        // Get current user from session
-        const sessionRes = await fetch(`${BASE_URL}/users/session`, {
-          credentials: 'include'
-        });
-        
-        if (!sessionRes.ok) {
-          setLoading(false);
-          return;
-        }
-        
-        const sessionData = await sessionRes.json();
-        if (!sessionData.authenticated) {
-          setLoading(false);
-          return;
-        }
-        
-        const currentUserId = sessionData.user.id;
-        setUserId(currentUserId);
         const [usersRes, friendsRes] = await Promise.all([
           fetch(`${BASE_URL}/users/`, { credentials: 'include' }),
-          fetch(`${BASE_URL}/friends/${currentUserId}`, { credentials: 'include' })
+          fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' })
         ]);
         
         const users = await usersRes.json();
@@ -59,7 +47,7 @@ const Friends = () => {
               }
             }
             // For pending requests, show incoming requests (where current user is followed_user_id)
-            else if (friend.status === 'pending' && friend.followed_user_id === currentUserId) {
+            else if (friend.status === 'pending' && friend.followed_user_id === user.id) {
               const requesterUser = usersMap[friend.following_user_id];
               if (requesterUser) {
                 pending.push({
@@ -76,14 +64,14 @@ const Friends = () => {
         setFriends(acceptedFriends);
         setPendingRequests(pending);
       } catch (error) {
-        console.error('Error fetching friends data:', error);
+
       } finally {
         setLoading(false);
       }
     };
     
     fetchFriendsData();
-  }, []);
+  }, [user]);
   
   const handleAcceptRequest = async (fromUserId) => {
     try {
@@ -93,7 +81,7 @@ const Friends = () => {
         credentials: 'include',
         body: JSON.stringify({
           following_user_id: fromUserId,
-          followed_user_id: userId,
+          followed_user_id: user.id,
           status: 'accepted'
         })
       });
@@ -104,7 +92,7 @@ const Friends = () => {
         setPendingRequests(prev => prev.filter(req => req.id !== fromUserId));
       }
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+
     }
   };
   

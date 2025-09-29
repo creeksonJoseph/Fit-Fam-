@@ -22,13 +22,24 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret")
 
-    # Standard Flask session configuration
+    # Production session configuration
     app.config['SESSION_PERMANENT'] = False
-    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_KEY_PREFIX'] = 'fitfam:'
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 
     db.init_app(app)
-    Session(app)  # Initialize Flask-Session
-    CORS(app, origins=['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://localhost:5000'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
+    CORS(app, 
+         origins=[
+             "http://localhost:3000",
+             "http://127.0.0.1:3000",
+             'https://fit-fam.onrender.com',
+             'https://group-fitness-app.onrender.com'], 
+         supports_credentials=True, 
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
     Api(app)
     Migrate(app, db)
 
@@ -37,6 +48,10 @@ def create_app():
     app.register_blueprint(progress_bp, url_prefix="/progress")
     app.register_blueprint(friends_bp, url_prefix="/friends")
     app.register_blueprint(workout_session_bp, url_prefix="/workout-sessions")
+
+    @app.route('/health')
+    def health_check():
+        return jsonify({"status": "healthy", "message": "Server is running"}), 200
 
     @app.errorhandler(404)
     def not_found(e):

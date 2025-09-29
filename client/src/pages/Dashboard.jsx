@@ -13,7 +13,7 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = "http://localhost:5000";
+  const BASE_URL = "https://group-fitness-app.onrender.com";
   const { user } = useAuth();
 
   useEffect(() => {
@@ -26,17 +26,17 @@ const Dashboard = () => {
       try {
         const currentUserId = user.id;
         // Fetch user workout stats
-        console.log('Dashboard: Fetching stats for user:', currentUserId);
+
         const statsRes = await fetch(`${BASE_URL}/workout-sessions/${currentUserId}/stats`, {
           credentials: 'include'
         });
-        console.log('Dashboard: Stats response status:', statsRes.status);
+
         const stats = statsRes.ok ? await statsRes.json() : {};
-        console.log('Dashboard: Raw stats from backend:', stats);
+
         
         const totalWorkouts = stats.total_workouts || 0;
         const totalDuration = stats.total_duration || 0;
-        console.log('Dashboard: Parsed values - workouts:', totalWorkouts, 'duration:', totalDuration);
+
         
         // Format total duration as hours/minutes/seconds
         const formatDuration = (seconds) => {
@@ -54,7 +54,7 @@ const Dashboard = () => {
         };
         
         const formattedDuration = formatDuration(totalDuration);
-        console.log('Dashboard: Formatted duration:', formattedDuration);
+
         
         // Fetch recent workout sessions
         const workoutRes = await fetch(`${BASE_URL}/workout-sessions/${currentUserId}`, {
@@ -75,33 +75,33 @@ const Dashboard = () => {
         }) : []
 
         // Fetch friends data to count accepted friends
-        console.log('Dashboard: Fetching friends data...');
+
         const friendsRes = await fetch(`${BASE_URL}/friends/${currentUserId}`, {
           credentials: 'include'
         });
         const friendsData = friendsRes.ok ? await friendsRes.json() : [];
         const totalFriends = Array.isArray(friendsData) ? friendsData.filter(f => f.status === 'accepted').length : 0;
-        console.log('Dashboard: Total accepted friends:', totalFriends);
+
         
         // Fetch all users for leaderboard
-        console.log('Dashboard: Fetching all users...');
+
         const usersRes = await fetch(`${BASE_URL}/users/`, {
           credentials: 'include'
         });
-        console.log('Dashboard: Users response status:', usersRes.status);
+
         const users = usersRes.ok ? await usersRes.json() : [];
-        console.log('Dashboard: Users data:', users);
+
 
         // Calculate leaderboard based on total workout time
-        console.log('Dashboard: Calculating leaderboard for', users.length, 'users');
+
         const leaderboardPromises = Array.isArray(users) ? users.map(async (user) => {
-          console.log('Dashboard: Fetching stats for user:', user.username, 'ID:', user.id);
+
           const userStatsRes = await fetch(
             `${BASE_URL}/workout-sessions/${user.id}/stats`,
             { credentials: 'include' }
           );
           const userStats = userStatsRes.ok ? await userStatsRes.json() : {};
-          console.log('Dashboard: User', user.username, 'stats:', userStats);
+
           return {
             id: user.id,
             username: user.username,
@@ -110,11 +110,11 @@ const Dashboard = () => {
         }) : [];
 
         const leaderboardData = await Promise.all(leaderboardPromises);
-        console.log('Dashboard: Leaderboard data before sorting:', leaderboardData);
+
         const sortedLeaderboard = leaderboardData
           .sort((a, b) => b.totalTime - a.totalTime)
           .slice(0, 5);
-        console.log('Dashboard: Final sorted leaderboard:', sortedLeaderboard);
+
 
         setProgressData({
           totalWorkouts,
@@ -124,7 +124,7 @@ const Dashboard = () => {
           leaderboard: sortedLeaderboard,
         });
       } catch (error) {
-        console.error("Error fetching progress data:", error);
+
       } finally {
         setLoading(false);
       }

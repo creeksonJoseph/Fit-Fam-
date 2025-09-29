@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
     if (checked) return;
     
     try {
-      const response = await fetch('http://localhost:5000/users/session', {
+      const response = await fetch('https://group-fitness-app.onrender.com/users/session', {
         credentials: 'include'
       });
       
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Session check failed:', error);
+
     } finally {
       setLoading(false);
       setChecked(true);
