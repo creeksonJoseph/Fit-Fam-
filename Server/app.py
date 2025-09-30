@@ -50,6 +50,12 @@ def create_app():
     @app.after_request
     def after_request(response):
         origin = request.headers.get('Origin')
+        method = request.method
+        path = request.path
+        
+        print(f"CORS DEBUG: {method} {path} from origin: {origin}")
+        print(f"CORS DEBUG: Response status: {response.status_code}")
+        
         allowed_origins = [
             "http://localhost:3000",
             "http://localhost:5173", 
@@ -57,12 +63,42 @@ def create_app():
             "http://127.0.0.1:5173",
             'https://fit-fam-six.vercel.app'
         ]
+        
         if origin in allowed_origins:
+            print(f"CORS DEBUG: Origin {origin} is allowed, adding headers")
             response.headers['Access-Control-Allow-Origin'] = origin
             response.headers['Access-Control-Allow-Credentials'] = 'true'
             response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
             response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        else:
+            print(f"CORS DEBUG: Origin {origin} is NOT in allowed list: {allowed_origins}")
+            
+        print(f"CORS DEBUG: Final response headers: {dict(response.headers)}")
         return response
+    
+    # Handle OPTIONS requests explicitly
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            origin = request.headers.get('Origin')
+            print(f"CORS DEBUG: Preflight OPTIONS request from {origin} to {request.path}")
+            
+            allowed_origins = [
+                "http://localhost:3000",
+                "http://localhost:5173", 
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5173",
+                'https://fit-fam-six.vercel.app'
+            ]
+            
+            if origin in allowed_origins:
+                response = jsonify({})
+                response.headers['Access-Control-Allow-Origin'] = origin
+                response.headers['Access-Control-Allow-Credentials'] = 'true'
+                response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
+                response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+                print(f"CORS DEBUG: Returning preflight response with headers")
+                return response
     Api(app)
 
     app.register_blueprint(user_bp, url_prefix="/users")
