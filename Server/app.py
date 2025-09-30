@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, session
+from flask import Flask, jsonify, session, request
 from flask_cors import CORS
 from flask_restful import Api
 from flask_migrate import Migrate
@@ -38,11 +38,31 @@ def create_app():
     CORS(app, 
          origins=[
              "http://localhost:3000",
+             "http://localhost:5173",
              "http://127.0.0.1:3000",
+             "http://127.0.0.1:5173",
              'https://fit-fam-six.vercel.app'], 
          supports_credentials=True, 
          allow_headers=['Content-Type', 'Authorization'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
+    
+    # Manual CORS handler for preflight requests
+    @app.after_request
+    def after_request(response):
+        origin = request.headers.get('Origin')
+        allowed_origins = [
+            "http://localhost:3000",
+            "http://localhost:5173", 
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5173",
+            'https://fit-fam-six.vercel.app'
+        ]
+        if origin in allowed_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
     Api(app)
 
     app.register_blueprint(user_bp, url_prefix="/users")
