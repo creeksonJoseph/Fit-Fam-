@@ -61,7 +61,7 @@ A full-stack fitness tracking application built with React and Flask that allows
 
 ## 🚀 Live Demo
 
-- **Frontend**: [https://group-fitness-app-frontend.onrender.com](https://group-fitness-app-frontend.onrender.com)
+- **Frontend**: [https://fit-fam-eight.vercel.app](https://fit-fam-eight.vercel.app)
 - **Backend API**: [https://group-fitness-app.onrender.com](https://group-fitness-app.onrender.com)
 
 ## 📋 Prerequisites

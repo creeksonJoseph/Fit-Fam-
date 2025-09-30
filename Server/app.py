@@ -36,7 +36,8 @@ def create_app():
              "http://localhost:3000",
              "http://127.0.0.1:3000",
              'https://fit-fam.onrender.com',
-             'https://group-fitness-app.onrender.com'], 
+             'https://group-fitness-app.onrender.com',
+             'https://fit-fam-eight.vercel.app'], 
          supports_credentials=True, 
          allow_headers=['Content-Type', 'Authorization'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
