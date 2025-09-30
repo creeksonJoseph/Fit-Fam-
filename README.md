@@ -1,121 +1,293 @@
-# Group_fitness_app
+# Group Fitness App 🏋️‍♂️
 
-A fitness web application that tracks progress of workouts for an individual or as a group of friends
+A full-stack fitness tracking application built with React and Flask that allows users to explore exercises, track workouts, and connect with friends.
 
-# File-structure
-# Client
-client/
-│
-├── public/                     
-│   ├── android-chrome-192x192.png              
-│   ├── android-chrome-512x512.png
-│   ├── apple-touch-icon.png
-│	├── april-laugh.jpg
-│	├── ben-weber-.jpg
-│	├── bruce-mars.jpg
-│	├── candra-winanta.jpg
-│	├── fat-lads.jpg
-│	├── favicon-16x16.png
-│	├── favicon-32x32.png
-│	├── facicon.ico
-│   └── site.webamanifest           
-│
-├── src/                        
-│   ├── assets/ 
-│   │   ├── android-chrome-192x192.png              
-│   │   ├── android-chrome-512x512.png
-│   │   ├── apple-touch-icon.png                
-│   │   ├── logo.png
-│	│   ├── favicon-16x16.png
-│	│   ├── favicon-32x32.png
-│	│   ├── facicon.ico
-│   │   └── site.webamanifest
-│   │
-│   ├── components/             
-│   │   ├── AppHeader.jsx
-│   │   ├── Button.jsx
-│   │   ├── Card.jsx
-│   │   ├── Logo.jsx
-│   │   ├── ProtectedRoute.jsx
-│   │   ├── SearchInput.jsx
-│   │   ├── Sidebar.jsx
-│   │   ├── Toast.jsx
-│   │   └── WorkoutCard.jsx
-│   ├── context/                
-│   │   └── AuthContext.jsx
-│   │
-│   ├── pages/                  
-│   │   ├── AddFriends.jsx
-│   │   ├── Dashboard.jsx
-│   │   ├── Friends.jsx
-│   │   ├── LandingPage.jsx
-│   │   ├── Login.jsx
-│   │   ├── Notifications.jsx
-│   │   ├── Profile.jsx
-│   │   ├── SignUp.jsx
-│   │   ├── WorkoutDetail.jsx
-│   │   ├── WorkoutHistory.jsx
-│   │   ├── Workouts.jsx
-│   │   └── WorkoutSession.jsx
-│   │
-│   │
-│   ├── App.jsx 
-│   └── main.jsx
-│
-├── package-lock.json
-├── tailwind.config.js
-├── index.html
-├── eslint.config.js
-├── .gitignore                        
-├── package.json
-├── vite.config.js              
+## 🌟 Features
+
+### 🔐 Authentication
+- User registration and login with Formik validation
+- Session-based authentication with secure cookies
+- Password hashing with bcrypt
+- Protected routes for authenticated users
+
+### 💪 Workout Management
+- Browse 1000+ exercises with GIFs and instructions
+- Filter exercises by body part and search functionality
+- Interactive workout timer with start/stop functionality
+- Save workout sessions with duration tracking
+- View workout history and statistics
+
+### 👥 Social Features
+- Send and receive friend requests
+- Accept/decline friend requests
+- View friends list with real-time status
+- Friend-based leaderboard system
+
+### 📊 Dashboard & Analytics
+- Personal workout statistics (total time, workouts completed)
+- Friends count and leaderboard
+- Recent workout activity
+- Time-based performance metrics
+
+### 👤 Profile Management
+- Update username and email
+- Profile image upload via Cloudinary
+- Personal workout statistics
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **React 18** - UI framework
+- **React Router** - Client-side routing
+- **Formik + Yup** - Form handling and validation
+- **Tailwind CSS** - Styling and responsive design
+- **Vite** - Build tool and development server
+
+### Backend
+- **Flask** - Web framework
+- **Flask-RESTful** - REST API development
+- **SQLAlchemy** - ORM and database management
+- **Flask-Migrate** - Database migrations
+- **Flask-CORS** - Cross-origin resource sharing
+- **bcrypt** - Password hashing
+
+### Database
+- **SQLite** - Development database
+- **PostgreSQL** - Production database (deployed)
+
+### External APIs
+- **Exercise API** - 1000+ exercises with GIFs and instructions
+- **Cloudinary** - Image upload and storage
+
+## 🚀 Live Demo
+
+- **Frontend**: [https://group-fitness-app-frontend.onrender.com](https://group-fitness-app-frontend.onrender.com)
+- **Backend API**: [https://group-fitness-app.onrender.com](https://group-fitness-app.onrender.com)
+
+## 📋 Prerequisites
+
+- Node.js (v16 or higher)
+- Python (v3.8 or higher)
+- pip (Python package manager)
+
+## ⚡ Quick Start
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/ogzacky75/Group_fitness_app.git
+cd Group_fitness_app
+```
+
+### 2. Backend Setup
+```bash
+cd Server
+pip install -r requirements.txt
+
+# Set environment variables
+export DATABASE_URI="sqlite:///fitness_app.db"
+export SECRET_KEY="your-secret-key"
+
+# Initialize database
+flask db upgrade
+python seed.py  # Optional: seed with sample data
+
+# Run the server
+python app.py
+```
+
+### 3. Frontend Setup
+```bash
+cd ../client
+npm install
+npm run dev
+```
+
+### 4. Access the Application
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:5000
+
+## 🗂️ Project Structure
+
+```
+Group_fitness_app/
+├── Server/                     # Flask backend
+│   ├── routes/                # API route handlers
+│   │   ├── User_routes.py     # Authentication & user management
+│   │   ├── Friends_routes.py  # Friend system
+│   │   ├── Workout_routes.py  # Exercise data
+│   │   └── Workout_session_routes.py  # Workout tracking
+│   ├── models.py              # Database models
+│   ├── app.py                 # Flask application factory
+│   ├── seed.py                # Database seeding
+│   └── requirements.txt       # Python dependencies
+├── client/                    # React frontend
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── contexts/          # React context providers
+│   │   ├── pages/             # Page components
+│   │   └── main.jsx           # Application entry point
+│   ├── package.json           # Node.js dependencies
+│   └── tailwind.config.js     # Tailwind CSS configuration
 └── README.md
+```
 
-# Server
-Server/
-├──flask_session/
-│
-├── migrations/                 
-│
-├── routes/                     
-│   ├── __pycache__/
-│   ├── User_routes.py
-│   ├── Workout_routes.py
-│   ├── Progress_routes.py
-│   ├── Friends_routes.py
-│   └── Workout_session_routes.py
-│
-├── models
-├── seed.py               
-├── app.py                
-├── config.py             
-└── requirements.txt               
+## 🔧 Environment Variables
 
-.gitignore
-LICENSE
-README.md
+### Backend (.env)
+```env
+DATABASE_URI=sqlite:///fitness_app.db
+SECRET_KEY=your-secret-key-here
+FLASK_ENV=production
+```
 
-# URL's for client and server
+### Frontend
+```env
+VITE_API_URL=http://localhost:5000
+```
 
-🌐 client = https://fit-fam.onrender.com
-🌐 server = https://group-fitness-app.onrender.com
+## 📊 Database Schema
 
-# How to run client locally
+### Users
+- id, username, email, password_hash, profile_image, created_at
 
-- Go to the client side and npm install
-- After you have installed the necessary packages, run: npm run dev 
+### Workouts
+- id, name, description, duration
 
-# How to run server locally
+### UserProgress
+- id, user_id, workout_id, progress, notes, time_completed
 
-- You need to run: python3 -m venv/bin/activate to install virtual environment
-- Next you pip install all packages in requirements.txt eg: pip install flask
-- After you finish, run: flask run to deploy server locally
+### Friends
+- id, following_user_id, followed_user_id, status, created_at
 
-# How the 🌐 web application works
+## 🔗 API Endpoints
 
-- You first start by signing up an account using your email account and you will be needed to create a strong password with requirements stated as you type
-- Once you have logged in your account is saved in the database and you can sign in again with the same email and password
-- Next you go to workouts section and grind a workout of your choosing, the workouts targets specific musclegroups so you can get the workout you want
-- After you have finished with the workout your progress is shown on the dashboard
-- You can add friends to help in participating in the workouts
-- There is a ranking system to see what your friends performance is like compared to yours in the dashboard
+### Authentication
+- `POST /users/register` - User registration
+- `POST /users/login` - User login
+- `POST /users/logout` - User logout
+- `GET /users/session` - Check session status
+
+### Users
+- `GET /users/` - Get all users
+- `GET /users/<id>` - Get user profile
+- `PUT /users/<id>` - Update user profile
+
+### Friends
+- `GET /friends/<user_id>` - Get user's friends
+- `POST /friends/request` - Send friend request
+- `DELETE /friends/request` - Cancel friend request
+
+### Workouts
+- `POST /workout-sessions/` - Save workout session
+- `GET /workout-sessions/<user_id>` - Get user workouts
+- `GET /workout-sessions/<user_id>/stats` - Get workout statistics
+
+## 🎨 Key Features Implementation
+
+### Formik Forms with Validation
+```jsx
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email").required("Required"),
+  password: Yup.string().min(8, "Min 8 characters").required("Required")
+});
+
+<Formik
+  initialValues={{ email: "", password: "" }}
+  validationSchema={validationSchema}
+  onSubmit={handleSubmit}
+>
+  {/* Form fields */}
+</Formik>
+```
+
+### Session-Based Authentication
+```python
+@login_required
+def put(self, user_id):
+    if session['user_id'] != user_id:
+        return {"error": "Unauthorized"}, 403
+    # Update user logic
+```
+
+### Real-time Workout Timer
+```jsx
+const [time, setTime] = useState(0);
+const [isRunning, setIsRunning] = useState(false);
+
+useEffect(() => {
+  let interval = null;
+  if (isRunning) {
+    interval = setInterval(() => setTime(time => time + 1), 1000);
+  }
+  return () => clearInterval(interval);
+}, [isRunning]);
+```
+
+## 🚀 Deployment
+
+### Backend (Render)
+1. Connect GitHub repository
+2. Set environment variables:
+   - `DATABASE_URI` (PostgreSQL)
+   - `SECRET_KEY`
+   - `FLASK_ENV=production`
+3. Deploy from main branch
+
+### Frontend (Render/Vercel)
+1. Build command: `npm run build`
+2. Publish directory: `dist`
+3. Set `VITE_API_URL` to backend URL
+
+## 🧪 Testing
+
+### Test User Credentials
+- **Email**: charanajoseph@gmail.com
+- **Password**: Jose.2010
+
+### API Testing
+```bash
+# Health check
+curl https://group-fitness-app.onrender.com/health
+
+# Get exercises
+curl https://fit-fam-server-1.onrender.com/exercises
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Joseph Charanja**
+- GitHub: [@ogzacky75](https://github.com/ogzacky75)
+- Email: charanajoseph@gmail.com
+
+## 🙏 Acknowledgments
+
+- Exercise data provided by ExerciseDB API
+- Image hosting by Cloudinary
+- Deployment by Render
+- UI inspiration from modern fitness apps
+
+## 📈 Future Enhancements
+
+- [ ] Real-time chat between friends
+- [ ] Workout challenges and competitions
+- [ ] Mobile app development
+- [ ] Advanced analytics and insights
+- [ ] Integration with fitness wearables
+- [ ] Nutrition tracking
+- [ ] Personal trainer matching
+
+---
+
+**Built with ❤️ for fitness enthusiasts everywhere!**
