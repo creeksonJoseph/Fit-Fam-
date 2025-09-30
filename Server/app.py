@@ -22,26 +22,30 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret")
 
-    # Production session configuration
+    db.init_app(app)
+    Migrate(app, db)
+
+    app.config["SESSION_TYPE"] = "sqlalchemy"
     app.config['SESSION_PERMANENT'] = False
     app.config['SESSION_USE_SIGNER'] = True
     app.config['SESSION_KEY_PREFIX'] = 'fitfam:'
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+    app.config["SESSION_SQLALCHEMY"] = db
+    Session(app)
 
-    db.init_app(app)
     CORS(app, 
          origins=[
              "http://localhost:3000",
              "http://127.0.0.1:3000",
              'https://fit-fam.onrender.com',
-             'https://group-fitness-app.onrender.com'], 
+             'https://group-fitness-app.onrender.com',
+             'https://fit-fam-eight.vercel.app'], 
          supports_credentials=True, 
          allow_headers=['Content-Type', 'Authorization'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
     Api(app)
-    Migrate(app, db)
 
     app.register_blueprint(user_bp, url_prefix="/users")
     app.register_blueprint(workout_bp, url_prefix="/workouts")
