@@ -61,6 +61,11 @@ def create_app():
     @app.errorhandler(404)
     def not_found(e):
         return jsonify({"error": "Not Found"}), 404
+    
+    @app.route('/version')
+    def version():
+        return jsonify({"message": "Deployed on Sep 30 2025 at 12:00PM", "status": "new code"})
+
 
     @app.errorhandler(500)
     def server_error(e):
