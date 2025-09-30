@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, session, request
+from flask import Flask, jsonify, session
 from flask_cors import CORS
 from flask_restful import Api
 from flask_migrate import Migrate
@@ -35,28 +35,17 @@ def create_app():
     app.config["SESSION_SQLALCHEMY"] = db
     Session(app)
 
-    # Simple CORS configuration
-    CORS(app, origins='*', supports_credentials=True)
-    
-    # Manual CORS handler
-    @app.after_request
-    def after_request(response):
-        origin = request.headers.get('Origin')
-        allowed_origins = [
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:3000", 
-            "http://127.0.0.1:5173",
-            'https://fit-fam-six.vercel.app'
-        ]
-        
-        if origin in allowed_origins:
-            response.headers['Access-Control-Allow-Origin'] = origin
-            response.headers['Access-Control-Allow-Credentials'] = 'true'
-            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        
-        return response
+    CORS(app, 
+         origins=[
+             "http://localhost:3000",
+             "http://127.0.0.1:3000",
+             'https://fit-fam.onrender.com',
+             'https://group-fitness-app.onrender.com',
+             'https://fit-fam-eight.vercel.app',
+             'https://fit-fam-six.vercel.app'], 
+         supports_credentials=True, 
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
     Api(app)
 
     app.register_blueprint(user_bp, url_prefix="/users")
