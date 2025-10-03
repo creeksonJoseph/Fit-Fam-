@@ -21,42 +21,29 @@ const Friends = () => {
       }
       
       try {
-        const [usersRes, friendsRes] = await Promise.all([
-          fetch(`${BASE_URL}/users/`, { credentials: 'include' }),
-          fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' })
-        ]);
-        
-        const users = await usersRes.json();
+        const friendsRes = await fetch(`${BASE_URL}/friends/${user.id}`, { credentials: 'include' });
         const friendsData = await friendsRes.json();
-        const usersMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
         
         const acceptedFriends = [];
         const pending = [];
         
         if (Array.isArray(friendsData)) {
           friendsData.forEach(friend => {
-            // For accepted friends, show the other user
             if (friend.status === 'accepted') {
-              const friendUser = usersMap[friend.followed_user_id];
-              if (friendUser) {
-                acceptedFriends.push({
-                  id: friendUser.id,
-                  username: friendUser.username,
-                  email: friendUser.email
-                });
-              }
+              acceptedFriends.push({
+                id: friend.id,
+                username: friend.username,
+                email: friend.email
+              });
             }
             // For pending requests, show incoming requests (where current user is followed_user_id)
             else if (friend.status === 'pending' && friend.followed_user_id === user.id) {
-              const requesterUser = usersMap[friend.following_user_id];
-              if (requesterUser) {
-                pending.push({
-                  id: requesterUser.id,
-                  username: requesterUser.username,
-                  email: requesterUser.email,
-                  mutualFriends: Math.floor(Math.random() * 5)
-                });
-              }
+              pending.push({
+                id: friend.id,
+                username: friend.username,
+                email: friend.email,
+                mutualFriends: Math.floor(Math.random() * 5)
+              });
             }
           });
         }
