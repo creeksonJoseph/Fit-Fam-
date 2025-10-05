@@ -13,11 +13,29 @@ class FriendList(Resource):
             return {"error": "User not found"}, 404
 
         # Get all friendships where user is either follower or followed
-        friends = Friends.query.filter(
+        friendships = Friends.query.filter(
             (Friends.following_user_id == user_id) | 
             (Friends.followed_user_id == user_id)
         ).all()
-        return [f.to_dict() for f in friends], 200
+        
+        friends_data = []
+        for friendship in friendships:
+            # Get the other user in the friendship
+            other_user_id = friendship.followed_user_id if friendship.following_user_id == user_id else friendship.following_user_id
+            other_user = User.query.get(other_user_id)
+            
+            if other_user:
+                friends_data.append({
+                    "id": other_user.id,
+                    "username": other_user.username,
+                    "email": other_user.email,
+                    "profile_image": other_user.profile_image,
+                    "status": friendship.status,
+                    "following_user_id": friendship.following_user_id,
+                    "followed_user_id": friendship.followed_user_id
+                })
+        
+        return friends_data, 200
 
 api.add_resource(FriendList, "/<int:user_id>")
 
