@@ -39,7 +39,7 @@ const Friends = () => {
             // For pending requests, show incoming requests (where current user is followed_user_id)
             else if (friend.status === 'pending' && friend.followed_user_id === user.id) {
               pending.push({
-                id: friend.id,
+                id: friend.following_user_id,
                 username: friend.username,
                 email: friend.email,
                 mutualFriends: Math.floor(Math.random() * 5)
