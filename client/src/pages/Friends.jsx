@@ -32,20 +32,17 @@ const Friends = () => {
         if (Array.isArray(friendsData)) {
           friendsData.forEach((friend) => {
             if (friend.status === "accepted") {
-              // Always use friend.id and friend.username (the other user's info)
               acceptedFriends.push({
                 id: friend.id,
                 username: friend.username,
                 email: friend.email,
               });
-            }
-            // For pending requests, show incoming requests (where current user is followed_user_id)
-            else if (
+            } else if (
               friend.status === "pending" &&
               friend.followed_user_id === user.id
             ) {
               pending.push({
-                id: friend.id, // Use friend.id, not friend.following_user_id
+                id: friend.id,
                 username: friend.username,
                 email: friend.email,
                 mutualFriends: Math.floor(Math.random() * 5),
