@@ -14,6 +14,7 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     profile_image = db.Column(db.String(500), nullable=True)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
     
     def set_password(self, password):
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -35,7 +36,7 @@ class User(db.Model, SerializerMixin):
         cascade="all, delete-orphan"
     )
 
-    serialize_only = ("id", "username", "email", "profile_image")
+    serialize_only = ("id", "username", "email", "profile_image", "is_admin")
 
 
 class Workout(db.Model, SerializerMixin):

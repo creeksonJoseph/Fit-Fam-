@@ -1,5 +1,6 @@
 import os
 from flask import Flask, jsonify, session
+from sqlalchemy import text
 from flask_cors import CORS
 from flask_restful import Api
 from flask_migrate import Migrate
@@ -11,6 +12,7 @@ from routes.Workout_routes import  workout_bp
 from routes.Progress_routes import progress_bp
 from routes.Friends_routes import friends_bp
 from routes.Workout_session_routes import workout_session_bp
+from routes.Admin_routes import admin_bp
 
 
 def create_app():
@@ -53,6 +55,7 @@ def create_app():
     app.register_blueprint(progress_bp, url_prefix="/progress")
     app.register_blueprint(friends_bp, url_prefix="/friends")
     app.register_blueprint(workout_session_bp, url_prefix="/workout-sessions")
+    app.register_blueprint(admin_bp, url_prefix="/admin")
 
     @app.route('/health')
     def health_check():
@@ -65,6 +68,45 @@ def create_app():
     @app.route('/version')
     def version():
         return jsonify({"message": "Deployed on Sep 30 2025 at 12:00PM", "status": "new code"})
+    
+    @app.route('/setup-admin')
+    def setup_admin():
+        try:
+            print("🔧 Starting admin setup...")
+            
+            # Check if is_admin column exists, if not add it
+            from sqlalchemy import text
+            result = db.session.execute(text(
+                "SELECT column_name FROM information_schema.columns WHERE table_name='users' AND column_name='is_admin'"
+            ))
+            if not result.fetchone():
+                print("📊 Adding is_admin column to users table...")
+                db.session.execute(text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT false NOT NULL"))
+                db.session.commit()
+                print("✅ is_admin column added successfully")
+            else:
+                print("ℹ️ is_admin column already exists")
+            
+            # Set admin role for charanajoseph@gmail.com
+            print("👤 Looking for user charanajoseph@gmail.com...")
+            admin_user = User.query.filter_by(email='charanajoseph@gmail.com').first()
+            if admin_user:
+                admin_user.is_admin = True
+                db.session.commit()
+                print("🎉 Admin role granted to charanajoseph@gmail.com")
+                print("🗑️ SETUP COMPLETE - SAFE TO DELETE THIS ROUTE")
+                return jsonify({
+                    "message": "Admin setup complete - SAFE TO DELETE THIS ROUTE", 
+                    "admin_email": "charanajoseph@gmail.com",
+                    "status": "SUCCESS"
+                }), 200
+            else:
+                print("❌ User charanajoseph@gmail.com not found")
+                return jsonify({"error": "User charanajoseph@gmail.com not found"}), 404
+        except Exception as e:
+            print(f"💥 Error during setup: {str(e)}")
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
 
 
     @app.errorhandler(500)

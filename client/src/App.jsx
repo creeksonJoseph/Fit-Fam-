@@ -16,6 +16,7 @@ import AddFriends from "./pages/AddFriends";
 import WorkoutDetail from "./pages/WorkoutDetail";
 import WorkoutSession from "./pages/WorkoutSession";
 import WorkoutHistory from "./pages/WorkoutHistory";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/workout-detail/:id" element={<ProtectedRoute><WorkoutDetail /></ProtectedRoute>} />
           <Route path="/workout-session/:id" element={<ProtectedRoute><WorkoutSession /></ProtectedRoute>} />
           <Route path="/workout-history" element={<ProtectedRoute><WorkoutHistory /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

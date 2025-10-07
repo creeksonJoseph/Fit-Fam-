@@ -1,8 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import Button from "./Button";
 
 const Sidebar = ({ activeTab = "" }) => {
+  const { user } = useAuth();
+  
   return (
     <>
       {/* Desktop Sidebar */}
@@ -54,6 +57,23 @@ const Sidebar = ({ activeTab = "" }) => {
             </svg>
             <span>Workouts</span>
           </Link>
+          {user?.is_admin && (
+            <Link
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium ${activeTab === "admin" ? "bg-primary/20 dark:bg-primary/30 text-gray-900 dark:text-white font-semibold" : "hover:bg-primary/10 dark:hover:bg-primary/20 text-gray-600 dark:text-gray-400"}`}
+              to="/admin"
+            >
+              <svg
+                fill="currentColor"
+                height="24"
+                viewBox="0 0 256 256"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+              </svg>
+              <span>Admin</span>
+            </Link>
+          )}
         </nav>
       </div>
       <Button
