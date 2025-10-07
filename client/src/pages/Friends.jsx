@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
+import ProfilePicture from "../components/ProfilePicture";
 
 const Friends = () => {
   const [friends, setFriends] = useState([]);
@@ -36,6 +37,7 @@ const Friends = () => {
                 id: friend.id,
                 username: friend.username,
                 email: friend.email,
+                profile_image: friend.profile_image,
               });
             } else if (
               friend.status === "pending" &&
@@ -45,6 +47,7 @@ const Friends = () => {
                 id: friend.id,
                 username: friend.username,
                 email: friend.email,
+                profile_image: friend.profile_image,
                 mutualFriends: Math.floor(Math.random() * 5),
               });
             }
@@ -171,11 +174,11 @@ const Friends = () => {
                       key={friend.id}
                       className="flex items-center gap-3 p-3 bg-white rounded-lg"
                     >
-                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                        <span className="text-primary font-semibold text-base">
-                          {friend.username.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                      <ProfilePicture 
+                        profileImage={friend.profile_image}
+                        username={friend.username}
+                        size="md"
+                      />
                       <div>
                         <p className="font-semibold text-base">
                           {friend.username}
@@ -205,11 +208,11 @@ const Friends = () => {
                       className="flex items-center justify-between p-3 bg-white rounded-lg"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-semibold text-base">
-                            {request.username.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
+                        <ProfilePicture 
+                          profileImage={request.profile_image}
+                          username={request.username}
+                          size="md"
+                        />
                         <div>
                           <p className="font-semibold text-base">
                             {request.username}

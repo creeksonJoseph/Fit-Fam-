@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
+import ProfilePicture from "../components/ProfilePicture";
 
 const AddFriends = () => {
   const [users, setUsers] = useState([]);
@@ -183,11 +184,12 @@ const AddFriends = () => {
                         key={user.id}
                         className="flex flex-col items-center gap-3 sm:gap-4 rounded-xl border border-background-dark/10 dark:border-background-light/10 bg-background-dark/5 dark:bg-background-light/5 p-4 sm:p-6"
                       >
-                        <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-primary/20 flex items-center justify-center ring-4 ring-primary/50">
-                          <span className="text-primary font-bold text-2xl">
-                            {user.username.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
+                        <ProfilePicture 
+                          profileImage={user.profile_image}
+                          username={user.username}
+                          size="xl"
+                          className="ring-4 ring-primary/50"
+                        />
                         <p className="text-base sm:text-lg font-bold text-background-dark dark:text-background-light text-center">
                           {user.username}
                         </p>

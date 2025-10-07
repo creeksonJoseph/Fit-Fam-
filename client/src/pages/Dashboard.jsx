@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import AppHeader from "../components/AppHeader";
+import ProfilePicture from "../components/ProfilePicture";
 
 const Dashboard = () => {
   const [progressData, setProgressData] = useState({
@@ -105,6 +106,7 @@ const Dashboard = () => {
           return {
             id: user.id,
             username: user.username,
+            profile_image: user.profile_image,
             totalTime: userStats.total_duration || 0,
           };
         }) : [];
@@ -283,7 +285,7 @@ const Dashboard = () => {
                             : ""
                         }`}
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <span
                             className={`font-medium text-sm ${
                               isCurrentUser
@@ -293,6 +295,12 @@ const Dashboard = () => {
                           >
                             {index + 1}
                           </span>
+                          <ProfilePicture 
+                            profileImage={leaderboardUser.profile_image}
+                            username={leaderboardUser.username}
+                            size="sm"
+                            className="w-8 h-8"
+                          />
                           <p
                             className={`font-medium text-sm ${
                               isCurrentUser

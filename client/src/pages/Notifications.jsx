@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import AppHeader from '../components/AppHeader';
+import ProfilePicture from '../components/ProfilePicture';
 
 const Notifications = () => {
   const [friendRequests, setFriendRequests] = useState({ incoming: [], outgoing: [] });
@@ -55,6 +56,7 @@ const Notifications = () => {
                   id: requesterUser.id,
                   username: requesterUser.username,
                   email: requesterUser.email,
+                  profile_image: requesterUser.profile_image,
                   mutualFriends: Math.floor(Math.random() * 5)
                 });
               } else {
@@ -71,6 +73,7 @@ const Notifications = () => {
                   id: followedUser.id,
                   username: followedUser.username,
                   email: followedUser.email,
+                  profile_image: followedUser.profile_image,
                   status: 'pending'
                 });
               } else {
@@ -88,6 +91,7 @@ const Notifications = () => {
                   id: followedUser.id,
                   username: followedUser.username,
                   email: followedUser.email,
+                  profile_image: followedUser.profile_image,
                   status: 'accepted',
                   type: 'outgoing'
                 });
@@ -102,6 +106,7 @@ const Notifications = () => {
                   id: requesterUser.id,
                   username: requesterUser.username,
                   email: requesterUser.email,
+                  profile_image: requesterUser.profile_image,
                   status: 'accepted',
                   type: 'incoming'
                 });
@@ -237,9 +242,12 @@ const Notifications = () => {
                   {friendRequests.incoming.map((request) => (
                     <div key={`incoming-${request.id}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="rounded-full w-10 h-10 flex-shrink-0 bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-semibold text-sm">{request.username.charAt(0).toUpperCase()}</span>
-                        </div>
+                        <ProfilePicture 
+                          profileImage={request.profile_image}
+                          username={request.username}
+                          size="sm"
+                          className="w-10 h-10 flex-shrink-0"
+                        />
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold text-background-dark truncate">{request.username}</p>
                           <p className="text-xs text-background-dark/60">{request.mutualFriends} mutual friends</p>
@@ -276,9 +284,12 @@ const Notifications = () => {
                   {friendRequests.outgoing.map((request, index) => (
                     <div key={`outgoing-${request.id}-${index}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="rounded-full w-8 h-8 flex-shrink-0 bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-semibold text-xs">{request.username.charAt(0).toUpperCase()}</span>
-                        </div>
+                        <ProfilePicture 
+                          profileImage={request.profile_image}
+                          username={request.username}
+                          size="sm"
+                          className="w-8 h-8 flex-shrink-0"
+                        />
                         <p className="text-sm text-background-dark/80 min-w-0">
                           {request.type === 'incoming' ? (
                             <><span className="font-semibold text-background-dark">{request.username}</span> requested to follow you</>
