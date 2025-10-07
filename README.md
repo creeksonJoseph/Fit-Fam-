@@ -339,8 +339,8 @@ PUT    /progress/<id>         # Update progress entry
 
 ### 👥 Development Team
 
-- **Backend Developer**: [Isaac Ogutu](https://github.com/ogzacky75)
-- **Frontend Developer**: [Joseph Charana](mailto:charanajoseph@gmail.com)
+- [Joseph Charana](mailto:charanajoseph@gmail.com)
+- [Isaac Ogutu](https://github.com/ogzacky75)
 
 ### 🔗 Links
 
