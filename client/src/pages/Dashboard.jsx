@@ -12,7 +12,12 @@ const Dashboard = () => {
     recentWorkouts: [],
     leaderboard: [],
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState({
+    stats: true,
+    workouts: true,
+    friends: true,
+    leaderboard: true
+  });
 
   const BASE_URL = "https://group-fitness-app.onrender.com";
   const { user } = useAuth();
@@ -20,51 +25,46 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProgressData = async () => {
       if (!user) {
-        setLoading(false);
+        setLoading({ stats: false, workouts: false, friends: false, leaderboard: false });
         return;
       }
       
-      try {
-        const currentUserId = user.id;
-        // Fetch user workout stats
+      const currentUserId = user.id;
+      
+      // Format duration helper
+      const formatDuration = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        
+        if (hours > 0) return { value: hours, unit: 'hr' };
+        if (minutes > 0) return { value: minutes, unit: 'min' };
+        return { value: remainingSeconds, unit: 'sec' };
+      };
 
-        const statsRes = await fetch(`${BASE_URL}/workout-sessions/${currentUserId}/stats`, {
-          credentials: 'include'
-        });
-
+      // 1. Load critical data first (stats + friends)
+      Promise.all([
+        fetch(`${BASE_URL}/workout-sessions/${currentUserId}/stats`, { credentials: 'include' }),
+        fetch(`${BASE_URL}/friends/${currentUserId}`, { credentials: 'include' })
+      ]).then(async ([statsRes, friendsRes]) => {
         const stats = statsRes.ok ? await statsRes.json() : {};
+        const friendsData = friendsRes.ok ? await friendsRes.json() : [];
+        
+        setProgressData(prev => ({
+          ...prev,
+          totalWorkouts: stats.total_workouts || 0,
+          totalDuration: formatDuration(stats.total_duration || 0),
+          totalFriends: Array.isArray(friendsData) ? friendsData.filter(f => f.status === 'accepted').length : 0
+        }));
+        setLoading(prev => ({ ...prev, stats: false, friends: false }));
+      });
 
-        
-        const totalWorkouts = stats.total_workouts || 0;
-        const totalDuration = stats.total_duration || 0;
-
-        
-        // Format total duration as hours/minutes/seconds
-        const formatDuration = (seconds) => {
-          const hours = Math.floor(seconds / 3600);
-          const minutes = Math.floor((seconds % 3600) / 60);
-          const remainingSeconds = seconds % 60;
-          
-          if (hours > 0) {
-            return { value: hours, unit: 'hr' };
-          } else if (minutes > 0) {
-            return { value: minutes, unit: 'min' };
-          } else {
-            return { value: remainingSeconds, unit: 'sec' };
-          }
-        };
-        
-        const formattedDuration = formatDuration(totalDuration);
-
-        
-        // Fetch recent workout sessions
-        const workoutRes = await fetch(`${BASE_URL}/workout-sessions/${currentUserId}`, {
-          credentials: 'include'
-        });
+      // 2. Load workouts data
+      Promise.all([
+        fetch(`${BASE_URL}/workout-sessions/${currentUserId}`, { credentials: 'include' }),
+        fetch('https://fit-fam-server-1.onrender.com/exercises')
+      ]).then(async ([workoutRes, exercisesRes]) => {
         const recentWorkouts = workoutRes.ok ? await workoutRes.json() : [];
-        
-        // Get exercise details for body parts
-        const exercisesRes = await fetch('https://fit-fam-server-1.onrender.com/exercises');
         const exercises = exercisesRes.ok ? await exercisesRes.json() : [];
         
         const latestWorkouts = Array.isArray(recentWorkouts) ? recentWorkouts.slice(0, 3).map(workout => {
@@ -73,81 +73,47 @@ const Dashboard = () => {
             ...workout,
             bodyPart: exercise?.bodyParts?.[0] || 'Unknown'
           };
-        }) : []
-
-        // Fetch friends data to count accepted friends
-
-        const friendsRes = await fetch(`${BASE_URL}/friends/${currentUserId}`, {
-          credentials: 'include'
-        });
-        const friendsData = friendsRes.ok ? await friendsRes.json() : [];
-        const totalFriends = Array.isArray(friendsData) ? friendsData.filter(f => f.status === 'accepted').length : 0;
-
-        
-        // Fetch all users for leaderboard
-
-        const usersRes = await fetch(`${BASE_URL}/users/`, {
-          credentials: 'include'
-        });
-
-        const users = usersRes.ok ? await usersRes.json() : [];
-
-
-        // Calculate leaderboard based on total workout time
-
-        const leaderboardPromises = Array.isArray(users) ? users.map(async (user) => {
-
-          const userStatsRes = await fetch(
-            `${BASE_URL}/workout-sessions/${user.id}/stats`,
-            { credentials: 'include' }
-          );
-          const userStats = userStatsRes.ok ? await userStatsRes.json() : {};
-
-          return {
-            id: user.id,
-            username: user.username,
-            profile_image: user.profile_image,
-            totalTime: userStats.total_duration || 0,
-          };
         }) : [];
+        
+        setProgressData(prev => ({ ...prev, recentWorkouts: latestWorkouts }));
+        setLoading(prev => ({ ...prev, workouts: false }));
+      });
 
-        const leaderboardData = await Promise.all(leaderboardPromises);
-
-        const sortedLeaderboard = leaderboardData
-          .sort((a, b) => b.totalTime - a.totalTime)
-          .slice(0, 5);
-
-
-        setProgressData({
-          totalWorkouts,
-          totalDuration: formattedDuration,
-          totalFriends,
-          recentWorkouts: latestWorkouts,
-          leaderboard: sortedLeaderboard,
+      // 3. Load leaderboard last (most expensive)
+      fetch(`${BASE_URL}/users/`, { credentials: 'include' })
+        .then(async (usersRes) => {
+          const users = usersRes.ok ? await usersRes.json() : [];
+          
+          const leaderboardPromises = Array.isArray(users) ? users.slice(0, 10).map(async (user) => {
+            const userStatsRes = await fetch(`${BASE_URL}/workout-sessions/${user.id}/stats`, { credentials: 'include' });
+            const userStats = userStatsRes.ok ? await userStatsRes.json() : {};
+            
+            return {
+              id: user.id,
+              username: user.username,
+              profile_image: user.profile_image,
+              totalTime: userStats.total_duration || 0,
+            };
+          }) : [];
+          
+          const leaderboardData = await Promise.all(leaderboardPromises);
+          const sortedLeaderboard = leaderboardData
+            .sort((a, b) => b.totalTime - a.totalTime)
+            .slice(0, 5);
+          
+          setProgressData(prev => ({ ...prev, leaderboard: sortedLeaderboard }));
+          setLoading(prev => ({ ...prev, leaderboard: false }));
         });
-      } catch (error) {
-
-      } finally {
-        setLoading(false);
-      }
     };
 
     fetchProgressData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="bg-background-light font-display text-text-light">
-        <AppHeader />
-        <div className="flex min-h-screen">
-          <Sidebar activeTab="dashboard" />
-          <main className="flex-1 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </main>
-        </div>
-      </div>
-    );
-  }
+  const LoadingSkeleton = ({ className }) => (
+    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+  );
+
+  const isFullyLoaded = !loading.stats && !loading.workouts && !loading.friends && !loading.leaderboard;
 
 
 
@@ -172,9 +138,13 @@ const Dashboard = () => {
                   <h3 className="font-semibold text-base text-background-dark">
                     Total Workouts
                   </h3>
-                  <span className="text-primary text-2xl font-bold">
-                    {progressData.totalWorkouts}
-                  </span>
+                  {loading.stats ? (
+                    <LoadingSkeleton className="w-8 h-8" />
+                  ) : (
+                    <span className="text-primary text-2xl font-bold">
+                      {progressData.totalWorkouts}
+                    </span>
+                  )}
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full">
                   <div
@@ -193,10 +163,14 @@ const Dashboard = () => {
                   <h3 className="font-semibold text-base text-background-dark">
                     Total Time
                   </h3>
-                  <span className="text-primary text-2xl font-bold">
-                    {progressData.totalDuration?.value || 0}
-                    <span className="text-base">{progressData.totalDuration?.unit || 'min'}</span>
-                  </span>
+                  {loading.stats ? (
+                    <LoadingSkeleton className="w-12 h-8" />
+                  ) : (
+                    <span className="text-primary text-2xl font-bold">
+                      {progressData.totalDuration?.value || 0}
+                      <span className="text-base">{progressData.totalDuration?.unit || 'min'}</span>
+                    </span>
+                  )}
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full">
                   <div
@@ -215,9 +189,13 @@ const Dashboard = () => {
                   <h3 className="font-semibold text-base text-background-dark">
                     Total Friends
                   </h3>
-                  <span className="text-primary text-2xl font-bold">
-                    {progressData.totalFriends || 0}
-                  </span>
+                  {loading.friends ? (
+                    <LoadingSkeleton className="w-6 h-8" />
+                  ) : (
+                    <span className="text-primary text-2xl font-bold">
+                      {progressData.totalFriends || 0}
+                    </span>
+                  )}
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full">
                   <div
@@ -238,7 +216,14 @@ const Dashboard = () => {
                   Recent Workouts
                 </h2>
                 <div className="space-y-2">
-                  {progressData.recentWorkouts.length === 0 ? (
+                  {loading.workouts ? (
+                    Array(3).fill(0).map((_, i) => (
+                      <div key={i} className="p-3 bg-gray-50 rounded-lg">
+                        <LoadingSkeleton className="w-32 h-4 mb-2" />
+                        <LoadingSkeleton className="w-20 h-3" />
+                      </div>
+                    ))
+                  ) : progressData.recentWorkouts.length === 0 ? (
                     <p className="text-background-dark/60 text-center py-8">No workouts yet</p>
                   ) : (
                     progressData.recentWorkouts.map((workout, index) => (
@@ -274,64 +259,77 @@ const Dashboard = () => {
                   Leaderboard
                 </h2>
                 <div className="space-y-3">
-                  {progressData.leaderboard.map((leaderboardUser, index) => {
-                    const isCurrentUser = leaderboardUser.id === user?.id;
-                    return (
-                      <div
-                        key={leaderboardUser.id}
-                        className={`flex items-center justify-between ${
-                          isCurrentUser
-                            ? "bg-primary/20 rounded-lg p-2 -m-2"
-                            : ""
-                        }`}
-                      >
+                  {loading.leaderboard ? (
+                    Array(5).fill(0).map((_, i) => (
+                      <div key={i} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span
-                            className={`font-medium text-sm ${
+                          <LoadingSkeleton className="w-4 h-4" />
+                          <LoadingSkeleton className="w-8 h-8 rounded-full" />
+                          <LoadingSkeleton className="w-16 h-4" />
+                        </div>
+                        <LoadingSkeleton className="w-8 h-4" />
+                      </div>
+                    ))
+                  ) : (
+                    progressData.leaderboard.map((leaderboardUser, index) => {
+                      const isCurrentUser = leaderboardUser.id === user?.id;
+                      return (
+                        <div
+                          key={leaderboardUser.id}
+                          className={`flex items-center justify-between ${
+                            isCurrentUser
+                              ? "bg-primary/20 rounded-lg p-2 -m-2"
+                              : ""
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`font-medium text-sm ${
+                                isCurrentUser
+                                  ? "text-primary"
+                                  : "text-background-dark/60"
+                              }`}
+                            >
+                              {index + 1}
+                            </span>
+                            <ProfilePicture 
+                              profileImage={leaderboardUser.profile_image}
+                              username={leaderboardUser.username}
+                              size="sm"
+                              className="w-8 h-8"
+                            />
+                            <p
+                              className={`font-medium text-sm ${
+                                isCurrentUser
+                                  ? "font-semibold text-primary"
+                                  : "text-background-dark"
+                              }`}
+                            >
+                              {isCurrentUser ? "You" : leaderboardUser.username}
+                            </p>
+                          </div>
+                          <p
+                            className={`font-semibold text-sm ${
                               isCurrentUser
                                 ? "text-primary"
-                                : "text-background-dark/60"
-                            }`}
-                          >
-                            {index + 1}
-                          </span>
-                          <ProfilePicture 
-                            profileImage={leaderboardUser.profile_image}
-                            username={leaderboardUser.username}
-                            size="sm"
-                            className="w-8 h-8"
-                          />
-                          <p
-                            className={`font-medium text-sm ${
-                              isCurrentUser
-                                ? "font-semibold text-primary"
                                 : "text-background-dark"
                             }`}
                           >
-                            {isCurrentUser ? "You" : leaderboardUser.username}
+                            {(() => {
+                              const seconds = leaderboardUser.totalTime;
+                              const hours = Math.floor(seconds / 3600);
+                              const minutes = Math.floor((seconds % 3600) / 60);
+                              const remainingSeconds = seconds % 60;
+                              
+                              if (hours > 0) return `${hours}h`;
+                              if (minutes > 0) return `${minutes}m`;
+                              return `${remainingSeconds}s`;
+                            })()} 
                           </p>
                         </div>
-                        <p
-                          className={`font-semibold text-sm ${
-                            isCurrentUser
-                              ? "text-primary"
-                              : "text-background-dark"
-                          }`}
-                        >
-                          {(() => {
-                            const seconds = leaderboardUser.totalTime;
-                            const hours = Math.floor(seconds / 3600);
-                            const minutes = Math.floor((seconds % 3600) / 60);
-                            const remainingSeconds = seconds % 60;
-                            
-                            if (hours > 0) return `${hours}h`;
-                            if (minutes > 0) return `${minutes}m`;
-                            return `${remainingSeconds}s`;
-                          })()} 
-                        </p>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
